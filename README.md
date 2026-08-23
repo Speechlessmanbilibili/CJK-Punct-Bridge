@@ -30,3 +30,7 @@ Language-aware alternates require the surrounding text/document to expose langua
 ## License
 
 CJK Punct Bridge is distributed under the **SIL Open Font License 1.1**. It is a modified/combined font and is not an official release of Hanken Grotesk, Noto/Source Han, or Zhudou Sans. See `OFL.txt` and `THIRD_PARTY_NOTICES.md`.
+
+## Building
+
+Source archive hashes are recorded in `SOURCES.md`; the merge strategy and reproducibility notes are documented in `BUILDING.md`.
