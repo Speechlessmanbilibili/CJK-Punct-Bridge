@@ -1,35 +1,35 @@
 # CJK Punct Bridge
 
-A compact CJK punctuation bridge font intended to sit before a normal Latin/CJK font stack.
+A compact language-aware CJK punctuation bridge font intended to sit before a normal Latin/CJK font stack.
 
 ## Behavior
 
-- **Unspecified/default language and Simplified Chinese (`ZHS`)**: Noto Sans SC punctuation.
-- **Traditional Chinese (`ZHT`)**: Noto Sans TC punctuation through `locl`.
-- **Japanese (`JAN`)**: Noto Sans JP punctuation through `locl`.
-- **Korean (`KOR`)**: Noto Sans KR punctuation through `locl`.
-- **English (`ENG`)**: common ambiguous punctuation (`· – — ‘ ’ “ ” …`) switches to Hanken Grotesk through `locl`.
-- `U+2014 —`, `U+2E3A ⸺`, `U+2E3B ⸻` use Zhudou-derived CJK dash outlines in every CJK/default path.
-- Repeated `U+2014` keeps Noto's `ccmp` machinery for continuous two-em/three-em CJK dashes. English deliberately does not enable that CJK `ccmp` path, so repeated English em dashes remain separate Hanken dashes.
-- Regional `vert` / `vrt2` punctuation behavior is retained for SC/TC/JP/KR, and vertical dash forms remain Zhudou-derived.
-
-The fallback for an absent or unrecognized OpenType language tag is deliberately **SC**, so an unspecified region stays Simplified-Chinese-oriented.
+- **No language/region tag defaults to Simplified Chinese (SC)** punctuation behavior.
+- Simplified Chinese (`ZHS`) uses Google Fonts **Noto Sans SC** punctuation; Traditional Chinese (`ZHT`), Japanese (`JAN`), and Korean (`KOR`) switch to punctuation outlines taken from the corresponding Google Fonts Noto Sans regional distributions through `locl`.
+- `U+2014 —`, `U+2E3A ⸺`, and `U+2E3B ⸻` use **Zhudou-derived** dash outlines on the SC and TC Chinese paths.
+- Noto punctuation shaping is retained, including `ccmp`, `dlig`, width features, `vert`, and `vrt2`. Repeated `U+2014` therefore keeps the continuous two-em/three-em behavior on CJK paths.
+- English (`ENG`) switches ambiguous shared punctuation (`· – — ‘ ’ “ ” …`) to **Hanken Grotesk** through `locl`; its language system intentionally omits the CJK continuous-dash `ccmp` feature.
+- Vertical metrics are retained. Regional vertical punctuation forms are selected after regional `locl` where the Noto source provides them.
 
 ## Downloads
 
-Prebuilt fonts are distributed through **GitHub Releases** rather than committed directly to the source repository. Release assets contain a variable TTF (`wght` 100–900), nine static TTF weights, and a variable WOFF2 for web use.
+Prebuilt fonts are distributed through **GitHub Releases** rather than committed directly to source history:
 
-## CSS example
+- variable TTF (`wght` 100–900);
+- nine static TTF weights;
+- variable WOFF2 for web use.
+
+## CSS
 
 ```css
 font-family: "CJK Punct Bridge", "Hanken Grotesk", "Noto Sans SC", sans-serif;
 ```
 
-Language-aware alternates require surrounding text/document language metadata such as HTML `lang`. Browsers do not reliably infer the intended language of punctuation from neighboring characters alone.
+Set the correct HTML `lang` value so shaping engines can select `ZHS` / `ZHT` / `JAN` / `KOR` / `ENG`. With no language metadata the bridge intentionally falls back to SC.
 
-## Regression checks
+## Building
 
-The release is checked for horizontal/vertical dash direction, `ENG` vs CJK language behavior, regional language-system presence, and source-outline identity. See `scripts/audit_release.py`, `scripts/check_dash_matrix.py`, and `scripts/add_cjk_locales.py`.
+Upstream binaries are **not committed**. `scripts/fetch_sources.py` can prefetch the exact pinned inputs into the gitignored `upstream/` directory; after that `scripts/build.py` is fully offline. See `BUILDING.md` and `SOURCES.md`.
 
 ## License
 
