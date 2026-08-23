@@ -93,7 +93,7 @@ def main():
     targets = [Path(p) for p in sys.argv[1:]]
     if not targets:
         root = Path(__file__).resolve().parents[1]
-        targets = sorted((root / "dist").rglob("*.ttf")) + sorted((root / "dist").rglob("*.woff2"))
+        targets = sorted((root / "fonts").rglob("*.ttf")) + sorted((root / "fonts").rglob("*.woff2"))
     if not targets:
         raise SystemExit("No font files found")
     for target in targets:
