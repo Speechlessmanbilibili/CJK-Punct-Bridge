@@ -1,7 +1,13 @@
-# Build and regression scripts
+# Build and audit scripts
 
-`build.py` is the audited build script for release 1.000. It expects the upstream font files under `upstream/` as described in `BUILDING.md` and writes compiled fonts to `dist/`.
+`build.py` is the audited build script used for release 1.000. It writes compiled fonts under the repository `fonts/` directory and accepts optional environment variables for source/workspace locations:
 
-`audit_release.py` performs structural checks for language-sensitive `ccmp` behavior, vertical metrics, dash orientation, and the variable `wght` axis.
+- `CJK_PUNCT_BUILD_WORKSPACE`
+- `CJK_PUNCT_UPSTREAM_DIR`
+- `CJK_PUNCT_ZHUDOU_DIR`
+- `CJK_PUNCT_ZHUDOU_LICENSE`
+- `CJK_PUNCT_BUILD_DIR`
 
-`check_dash_matrix.py` exercises the `—`, `——`, and `———` substitution paths for default/CJK, English, horizontal, and vertical shaping without requiring HarfBuzz.
+`SOURCES.md` records the exact upstream archive hashes used for the published binaries.
+
+`audit_release.py` and `check_dash_matrix.py` perform structural regression checks for language-sensitive `ccmp` behavior, vertical metrics, dash orientation, and the variable weight axis.
