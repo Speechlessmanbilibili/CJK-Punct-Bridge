@@ -7,15 +7,17 @@ A compact CJK punctuation bridge font. It is intended to sit before a normal Lat
 - Default punctuation outlines: **Noto Sans SC**.
 - `U+2014 —`, `U+2E3A ⸺`, `U+2E3B ⸻`: **Zhudou-derived** dash outlines.
 - Repeated `U+2014` uses Noto's original `ccmp` machinery with the Zhudou-derived continuous two-em/three-em dash outlines.
-- Vertical `vert`/`vrt2` behavior and vertical metrics are retained from Noto Sans SC; dash vertical forms are replaced by the corresponding Zhudou-derived forms.
+- Vertical `vert` / `vrt2` behavior and vertical metrics are retained from Noto Sans SC; dash vertical forms are replaced by the corresponding Zhudou-derived forms.
 - When an OpenType shaping engine supplies English language (`ENG`, e.g. HTML `lang="en"`), common ambiguous punctuation (`· – — ‘ ’ “ ” …`) switches to **Hanken Grotesk** through `locl`.
 - Without a language tag, the default is CJK-oriented.
 
-## Files
+## Downloads
 
-- `fonts/variable/CJKPunctBridge-Variable.ttf`: `wght` 100–900.
-- `fonts/static/`: nine static weights.
-- `fonts/web/CJKPunctBridge-Variable.woff2`: web variable font.
+Prebuilt fonts are distributed through **GitHub Releases** rather than committed directly to the source repository. Release assets include:
+
+- a variable TTF (`wght` 100–900);
+- nine static TTF weights;
+- a variable WOFF2 for web use.
 
 ## CSS example
 
@@ -27,4 +29,4 @@ Language-aware alternates require the surrounding text/document to expose langua
 
 ## License
 
-SIL Open Font License 1.1. This is a modified/combined font and is not an official release of Hanken Grotesk, Noto/Source Han, or Zhudou Sans. See `OFL.txt` and `licenses/`. Reserved upstream names are not used as the primary family name.
+CJK Punct Bridge is distributed under the **SIL Open Font License 1.1**. It is a modified/combined font and is not an official release of Hanken Grotesk, Noto/Source Han, or Zhudou Sans. See `OFL.txt` and `THIRD_PARTY_NOTICES.md`.

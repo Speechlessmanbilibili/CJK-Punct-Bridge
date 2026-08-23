@@ -1,0 +1,8 @@
+sources/
+build/
+*.pyc
+__pycache__/
+fonts/**/*.ttf
+fonts/**/*.otf
+fonts/**/*.woff
+fonts/**/*.woff2
