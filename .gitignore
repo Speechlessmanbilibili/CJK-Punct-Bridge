@@ -1,8 +1,6 @@
-sources/
+upstream/
 build/
-*.pyc
+dist/
 __pycache__/
-fonts/**/*.ttf
-fonts/**/*.otf
-fonts/**/*.woff
-fonts/**/*.woff2
+*.pyc
+.DS_Store
