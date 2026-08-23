@@ -1,64 +1,40 @@
 # Building CJK Punct Bridge
 
-CJK Punct Bridge is built from three OFL-licensed upstream font families. Exact source archive hashes are recorded in `SOURCES.md`.
+CJK Punct Bridge is built from OFL-licensed upstream font families. Exact source hashes are recorded in `SOURCES.md`.
 
-## Inputs
+## Stage 1: base SC/English bridge
 
-- Noto Sans SC: base punctuation glyphs, CJK metrics, `ccmp`, `vert`, `vrt2`, and vertical metrics.
-- Zhudou Sans: CJK em-dash outlines, including horizontal and vertical one-em/two-em/three-em dash forms.
-- Hanken Grotesk: English-localized shared punctuation alternates.
+`scripts/build.py` builds the SC-oriented base from Noto Sans SC, Zhudou Sans, and Hanken Grotesk. It retains Noto CJK layout/vertical machinery, substitutes Zhudou-derived dash forms, and adds the Hanken `ENG` `locl` path.
 
-Place the required source fonts under the repository-local `upstream/` directory before running `scripts/build.py`:
+The resulting variable font is the input to the regional layer. The default language path remains SC.
 
-```text
-upstream/
-├─ noto/
-│  ├─ NotoSansSC-Thin.ttf
-│  ├─ NotoSansSC-Light.ttf
-│  ├─ NotoSansSC-Regular.ttf
-│  ├─ NotoSansSC-Bold.ttf
-│  └─ NotoSansSC-Black.ttf
-├─ hanken/
-│  ├─ HankenGrotesk-Thin.ttf
-│  ├─ HankenGrotesk-Light.ttf
-│  ├─ HankenGrotesk-Regular.ttf
-│  ├─ HankenGrotesk-Bold.ttf
-│  └─ HankenGrotesk-Black.ttf
-└─ zhudou/
-   ├─ ZhudouSans-ExtraLight.ttf
-   ├─ ZhudouSans-Light.ttf
-   ├─ ZhudouSans-Regular.ttf
-   ├─ ZhudouSans-Bold.ttf
-   └─ ZhudouSans-Heavy.ttf
-```
+## Stage 2: TC/JP/KR locale layer
 
-Then run:
+`scripts/add_cjk_locales.py` adds Noto Sans TC/JP/KR punctuation as `ZHT`, `JAN`, and `KOR` `locl` alternatives. The three CJK dash code points are intentionally excluded from the regional replacement so all CJK/default paths keep the same Zhudou-derived continuous-dash behavior. Regional `vert` and `vrt2` targets are copied with their horizontal punctuation.
+
+Set the source paths and run:
 
 ```bash
-python scripts/build.py
-python scripts/audit_release.py dist/static/CJKPunctBridge-Regular.ttf dist/variable/CJKPunctBridge-Variable.ttf
-python scripts/check_dash_matrix.py
+export CJK_PUNCT_BASE_VARIABLE=/path/to/CJKPunctBridge-Variable.ttf
+export CJK_PUNCT_TC_VARIABLE=/path/to/NotoSansTC-wght.ttf
+export CJK_PUNCT_JP_VARIABLE=/path/to/NotoSansJP-wght.ttf
+export CJK_PUNCT_KR_VARIABLE=/path/to/NotoSansKR-wght.ttf
+export CJK_PUNCT_LOCALE_BUILD_DIR=/path/to/dist
+python scripts/add_cjk_locales.py
 ```
 
-Compiled outputs are written to `dist/`.
-
-## Build strategy
-
-1. Start from Noto Sans SC punctuation coverage.
-2. Keep Noto's CJK layout machinery and vertical metrics.
-3. Resolve the Simplified-Chinese horizontal `locl` targets and their true `vert` targets from GSUB instead of relying on glyph names.
-4. Replace `U+2014`, `U+2E3A`, `U+2E3B`, their Simplified-Chinese localized horizontal forms, and their corresponding vertical targets with Zhudou-derived outlines.
-5. Add Hanken-derived alternates for shared punctuation such as `· – — ‘ ’ “ ” …`.
-6. Attach those alternates to an `ENG` OpenType `locl` path while removing the CJK continuous-dash `ccmp` feature from the English path.
-7. Produce a variable TTF, nine static TTF weights, and a variable WOFF2.
+The locale layer is rebuilt at 100/300/400/700/900 masters, then interpolated back to a `wght` 100–900 variable font. Nine static weights and a variable WOFF2 are emitted as well.
 
 ## OpenType behavior
 
-- Repeated `U+2014` uses the retained Noto `ccmp` machinery to form continuous two-em/three-em dashes in default/CJK language systems.
-- English `ENG` runs use Hanken shared punctuation alternates and do not apply the CJK repeated-em-dash ligature.
-- `vert` and `vrt2` retain vertical punctuation behavior, with Zhudou-derived vertical dash forms substituted where appropriate.
-- The build also extends the default vertical path so vertical dash substitution works even when an engine supplies vertical direction without an explicit `ZHS` language tag.
+- Missing/unrecognized language tag: SC/default punctuation.
+- `ZHS`: SC punctuation.
+- `ZHT`: TC punctuation.
+- `JAN`: JP punctuation.
+- `KOR`: KR punctuation.
+- `ENG`: Hanken shared punctuation; CJK repeated-em-dash `ccmp` disabled.
+- CJK/default paths retain continuous `——` / `———` and CJK vertical dash forms.
 
 ## Distribution
 
-Prebuilt TTF and WOFF2 files are published as GitHub Release assets and are intentionally omitted from normal Git history.
+Prebuilt TTF and WOFF2 files are published as GitHub Release assets and intentionally omitted from normal Git history.

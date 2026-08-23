@@ -4,21 +4,20 @@ A compact CJK punctuation bridge font intended to sit before a normal Latin/CJK 
 
 ## Behavior
 
-- Default punctuation outlines: **Noto Sans SC**.
-- `U+2014 —`, `U+2E3A ⸺`, `U+2E3B ⸻`: **Zhudou-derived** dash outlines.
-- Repeated `U+2014` uses Noto's `ccmp` machinery with Zhudou-derived continuous two-em/three-em dash outlines in the default/CJK path.
-- Vertical `vert` / `vrt2` behavior and vertical metrics are retained from Noto Sans SC; dash vertical forms are replaced by the corresponding Zhudou-derived forms.
-- When an OpenType shaping engine supplies English language (`ENG`, e.g. HTML `lang="en"`), common ambiguous punctuation (`· – — ‘ ’ “ ” …`) switches to **Hanken Grotesk** through `locl`.
-- The English path deliberately does **not** enable the CJK continuous-dash `ccmp`, so repeated English em dashes remain separate Hanken em dashes.
-- Without a language tag, the default is CJK-oriented.
+- **Unspecified/default language and Simplified Chinese (`ZHS`)**: Noto Sans SC punctuation.
+- **Traditional Chinese (`ZHT`)**: Noto Sans TC punctuation through `locl`.
+- **Japanese (`JAN`)**: Noto Sans JP punctuation through `locl`.
+- **Korean (`KOR`)**: Noto Sans KR punctuation through `locl`.
+- **English (`ENG`)**: common ambiguous punctuation (`· – — ‘ ’ “ ” …`) switches to Hanken Grotesk through `locl`.
+- `U+2014 —`, `U+2E3A ⸺`, `U+2E3B ⸻` use Zhudou-derived CJK dash outlines in every CJK/default path.
+- Repeated `U+2014` keeps Noto's `ccmp` machinery for continuous two-em/three-em CJK dashes. English deliberately does not enable that CJK `ccmp` path, so repeated English em dashes remain separate Hanken dashes.
+- Regional `vert` / `vrt2` punctuation behavior is retained for SC/TC/JP/KR, and vertical dash forms remain Zhudou-derived.
+
+The fallback for an absent or unrecognized OpenType language tag is deliberately **SC**, so an unspecified region stays Simplified-Chinese-oriented.
 
 ## Downloads
 
-Prebuilt fonts are distributed through **GitHub Releases** rather than committed directly to the source repository. Release assets include:
-
-- a variable TTF (`wght` 100–900);
-- nine static TTF weights;
-- a variable WOFF2 for web use.
+Prebuilt fonts are distributed through **GitHub Releases** rather than committed directly to the source repository. Release assets contain a variable TTF (`wght` 100–900), nine static TTF weights, and a variable WOFF2 for web use.
 
 ## CSS example
 
@@ -26,16 +25,12 @@ Prebuilt fonts are distributed through **GitHub Releases** rather than committed
 font-family: "CJK Punct Bridge", "Hanken Grotesk", "Noto Sans SC", sans-serif;
 ```
 
-Language-aware alternates require the surrounding text/document to expose language metadata to the shaping engine. Browsers do not reliably infer language per phrase.
+Language-aware alternates require surrounding text/document language metadata such as HTML `lang`. Browsers do not reliably infer the intended language of punctuation from neighboring characters alone.
 
 ## Regression checks
 
-The release is checked for horizontal/vertical dash direction, `ENG` vs `ZHS` language behavior, and source-outline identity for Noto/Hanken-derived punctuation. See `scripts/audit_release.py` and `scripts/check_dash_matrix.py`.
+The release is checked for horizontal/vertical dash direction, `ENG` vs CJK language behavior, regional language-system presence, and source-outline identity. See `scripts/audit_release.py`, `scripts/check_dash_matrix.py`, and `scripts/add_cjk_locales.py`.
 
 ## License
 
 CJK Punct Bridge is distributed under the **SIL Open Font License 1.1**. It is a modified/combined font and is not an official release of Hanken Grotesk, Noto/Source Han, or Zhudou Sans. See `OFL.txt` and `THIRD_PARTY_NOTICES.md`.
-
-## Building
-
-Source archive hashes are recorded in `SOURCES.md`; the merge strategy and reproducibility notes are documented in `BUILDING.md`.

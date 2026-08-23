@@ -1,5 +1,15 @@
 # FONTLOG
 
+## 1.100 — 2026-08-24
+
+- Added `ZHT` localized punctuation from Noto Sans TC.
+- Added `JAN` localized punctuation from Noto Sans JP.
+- Added `KOR` localized punctuation from Noto Sans KR.
+- Kept unspecified/default and `ZHS` punctuation on the SC path.
+- Kept Zhudou-derived one-/two-/three-em dash behavior across every CJK/default path.
+- Added regional vertical punctuation targets for `vert` / `vrt2`.
+- Preserved the Hanken `ENG` `locl` path and its separate repeated em dashes.
+
 ## 1.000 — 2026-08-23
 
 - Initial public release.
