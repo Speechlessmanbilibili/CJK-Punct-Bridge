@@ -7,6 +7,7 @@ from language_systems import (
  WESTERN_LANGUAGE_SYSTEMS,
  WESTERN_SCRIPT_TAGS,
 )
+from font_metadata import audit_metadata
 
 REGIONS=tuple(tag for aliases in CJK_LANGUAGE_ALIASES.values() for tag in aliases)
 
@@ -39,6 +40,8 @@ def singlemap(font,script,lang,feature):
 
 def audit(path):
  f=TTFont(path); cmap=f.getBestCmap()
+ unique_id='CJKPunctBridge-VF' if 'fvar' in f else path.stem
+ audit_metadata(f,unique_id)
  assert len(cmap)>=180
  assert not set(range(0x30,0x3A)) & set(cmap),(path,'ASCII digits must be supplied by Hanken, not the bridge')
  assert {'ccmp','dlig','locl','vert','vrt2'} <= tags(f,'DFLT',None)

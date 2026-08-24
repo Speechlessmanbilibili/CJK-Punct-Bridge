@@ -10,6 +10,7 @@
 - Split Noto SC's shared `U+00B7`/`U+2022` source glyph inside the bridge so both code points can select their distinct Hanken designs without changing CJK behavior.
 - Repaired the pinned Zhudou v2.000 release-asset URL after the upstream archive name changed.
 - Documented that every Noto Sans and Hanken Grotesk build input must come from a pinned Google Fonts repository commit.
+- Replaced inherited upstream identity fields with explicit project authorship, modification copyright, source attribution, repository links, OFL details, and a project-aligned internal revision in every static, variable, and web font.
 
 ## 1.100 — 2026-08-24
 

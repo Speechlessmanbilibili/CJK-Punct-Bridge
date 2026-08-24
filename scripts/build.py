@@ -16,6 +16,7 @@ from language_systems import (
     WESTERN_LANGUAGE_SYSTEMS,
     WESTERN_SCRIPT_TAGS,
 )
+from font_metadata import apply_binary_metadata, project_names, VERSION
 
 REPO = Path(__file__).resolve().parents[1]
 UP = Path(os.environ.get("CJK_PUNCT_UPSTREAM_DIR", REPO / "upstream"))
@@ -26,7 +27,6 @@ for p in [WORK, OUT/"fonts"/"variable", OUT/"fonts"/"static", OUT/"fonts"/"web"]
 
 FAMILY="CJK Punct Bridge"
 PS="CJKPunctBridge"
-VERSION="1.200"
 MASTER_WEIGHTS={100:"Thin",300:"Light",400:"Regular",700:"Bold",900:"Black"}
 ALL_WEIGHTS={100:"Thin",200:"ExtraLight",300:"Light",400:"Regular",500:"Medium",600:"SemiBold",700:"Bold",800:"ExtraBold",900:"Black"}
 REGIONS={
@@ -38,11 +38,6 @@ REGIONS={
 HANKEN=UP/"HankenGrotesk-wght.ttf"
 ZDIR=UP/"zhudou"/"ttf"
 ZFILES={100:ZDIR/"ZhudouSans-ExtraLight.ttf",300:ZDIR/"ZhudouSans-Light.ttf",400:ZDIR/"ZhudouSans-Regular.ttf",700:ZDIR/"ZhudouSans-Bold.ttf",900:ZDIR/"ZhudouSans-Heavy.ttf"}
-
-COPYRIGHT=("Portions Copyright 2021 The Hanken Grotesk Project Authors. "
-           "Portions Copyright 2014-2021 Adobe, with Reserved Font Name 'Source'. "
-           "Portions Copyright 2022 Buernia, with Reserved Font Names 'Zhudou' and '煮豆'; portions Copyright 2015 Google Inc. "
-           "CJK Punct Bridge is a modified/combined font distributed under SIL Open Font License 1.1.")
 
 def require_files():
     missing=[str(p) for _,p in REGIONS.values() if not p.exists()]
@@ -68,11 +63,11 @@ def set_static_names(f,w,style):
     legacy_family=FAMILY if w in (400,700) else f"{FAMILY} {style}"
     legacy_sub="Bold" if w==700 else "Regular"
     full=FAMILY if w==400 else f"{FAMILY} {style}"
-    vals={0:COPYRIGHT,1:legacy_family,2:legacy_sub,3:f"{VERSION};BridgeBuild;{PS}-{style}",
-          4:full,5:f"Version {VERSION}",6:f"{PS}-{style}",13:"SIL Open Font License, Version 1.1",
-          14:"https://openfontlicense.org",16:FAMILY,17:style,25:PS}
+    vals={**project_names(f"{PS}-{style}"),1:legacy_family,2:legacy_sub,
+          4:full,6:f"{PS}-{style}",16:FAMILY,17:style,25:PS}
     for k,v in vals.items(): setname(nt,k,v)
-    o=f["OS/2"]; o.usWeightClass=w; o.achVendID="NONE"
+    apply_binary_metadata(f)
+    o=f["OS/2"]; o.usWeightClass=w
     fs=o.fsSelection
     for bit in (0,5,6,9): fs &= ~(1<<bit)
     if w==400: fs|=1<<6
@@ -356,9 +351,10 @@ def main():
         if tag in reg: vf[tag]=deepcopy(reg[tag])
     reg.close()
     nt=vf["name"]
-    for k,v in {0:COPYRIGHT,1:FAMILY,2:"Regular",3:f"{VERSION};BridgeBuild;{PS}-VF",4:FAMILY,5:f"Version {VERSION}",
-                6:PS,13:"SIL Open Font License, Version 1.1",14:"https://openfontlicense.org",16:FAMILY,17:"Regular",25:PS}.items():
+    for k,v in {**project_names(f"{PS}-VF"),1:FAMILY,2:"Regular",4:FAMILY,
+                6:PS,16:FAMILY,17:"Regular",25:PS}.items():
         setname(nt,k,v)
+    apply_binary_metadata(vf)
     for inst,(w,s) in zip(vf["fvar"].instances,ALL_WEIGHTS.items()):
         inst.subfamilyNameID=nt.addName(s,platforms=((3,1,0x409),(1,0,0)))
     try:
