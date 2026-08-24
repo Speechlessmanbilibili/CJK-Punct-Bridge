@@ -1,5 +1,16 @@
 # FONTLOG
 
+## 1.200 — 2026-08-24
+
+- Expanded Hanken `locl` coverage from eight ambiguous English marks to all 46 punctuation code points shared by the bridge and the pinned Google Fonts Hanken Grotesk distribution.
+- Made ASCII digits a hard bridge exclusion so `0`–`9` always fall through to Hanken Grotesk in every language.
+- Applied the Hanken punctuation path to the configured registered Western languages in Common, Latin, Cyrillic, and Greek runs, while keeping every default LangSys on Noto Sans SC.
+- Added explicit Noto regional aliases for Chinese Hong Kong/Macao/phonetic tags and Korean old Hangul.
+- Hardened release audits to check the complete Hanken punctuation mapping, every Western language system, all CJK regional aliases, and the no-ligation dash policy.
+- Split Noto SC's shared `U+00B7`/`U+2022` source glyph inside the bridge so both code points can select their distinct Hanken designs without changing CJK behavior.
+- Repaired the pinned Zhudou v2.000 release-asset URL after the upstream archive name changed.
+- Documented that every Noto Sans and Hanken Grotesk build input must come from a pinned Google Fonts repository commit.
+
 ## 1.100 — 2026-08-24
 
 - Expanded the bridge from SC/English to a single SC/TC/JP/KR/English language-aware punctuation font.

@@ -1,6 +1,9 @@
 upstream/
 build/
 dist/
+fonts/static/
+fonts/variable/
+fonts/web/
 __pycache__/
 *.pyc
 .DS_Store

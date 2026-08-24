@@ -10,6 +10,12 @@ from fontTools.varLib.instancer import instantiateVariableFont
 from fontTools.designspaceLib import DesignSpaceDocument, AxisDescriptor, SourceDescriptor, InstanceDescriptor
 from fontTools.otlLib.builder import buildLookup, buildSingleSubstSubtable, buildStatTable
 from fontTools.ttLib.tables import otTables
+from language_systems import (
+    CJK_LANGUAGE_ALIASES,
+    HANKEN_SHARED_PUNCTUATION,
+    WESTERN_LANGUAGE_SYSTEMS,
+    WESTERN_SCRIPT_TAGS,
+)
 
 REPO = Path(__file__).resolve().parents[1]
 UP = Path(os.environ.get("CJK_PUNCT_UPSTREAM_DIR", REPO / "upstream"))
@@ -20,7 +26,7 @@ for p in [WORK, OUT/"fonts"/"variable", OUT/"fonts"/"static", OUT/"fonts"/"web"]
 
 FAMILY="CJK Punct Bridge"
 PS="CJKPunctBridge"
-VERSION="1.100"
+VERSION="1.200"
 MASTER_WEIGHTS={100:"Thin",300:"Light",400:"Regular",700:"Bold",900:"Black"}
 ALL_WEIGHTS={100:"Thin",200:"ExtraLight",300:"Light",400:"Regular",500:"Medium",600:"SemiBold",700:"Bold",800:"ExtraBold",900:"Black"}
 REGIONS={
@@ -83,6 +89,33 @@ def copy_glyph(dst,src,sn,dn):
             dst["vmtx"].metrics[dn]=src["vmtx"].metrics[sn]
         else:
             dst["vmtx"].metrics[dn]=(1000,0)
+
+def split_encoded_glyph(font,cp,suffix):
+    """Give one encoded character its own GSUB-visible source glyph.
+
+    Noto SC intentionally maps U+00B7 MIDDLE DOT and U+2022 BULLET to the same
+    glyph, while Hanken gives them different designs.  A locl substitution
+    sees glyph IDs rather than code points, so the public inputs must be split
+    before Western alternates are attached.  Existing Noto single-substitution
+    behavior is mirrored onto the duplicate to keep every CJK path unchanged.
+    """
+    cmap=font.getBestCmap(); base=cmap[cp]; order=list(font.getGlyphOrder())
+    duplicate=f"{base}.{suffix}"; k=2
+    while duplicate in order:
+        duplicate=f"{base}.{suffix}{k}"; k+=1
+    order.append(duplicate); copy_glyph(font,font,base,duplicate); font.setGlyphOrder(order)
+    for table in font["cmap"].tables:
+        if hasattr(table,"cmap") and cp in table.cmap:
+            table.cmap[cp]=duplicate
+    if "GSUB" in font:
+        for lookup in font["GSUB"].table.LookupList.Lookup:
+            for subtable in lookup.SubTable:
+                typ=lookup.LookupType
+                if typ==7:
+                    subtable=subtable.ExtSubTable; typ=subtable.ExtensionLookupType
+                if typ==1 and hasattr(subtable,"mapping") and base in subtable.mapping:
+                    subtable.mapping[duplicate]=subtable.mapping[base]
+    return duplicate
 
 def get_script(table, tag, create=False):
     for sr in table.ScriptList.ScriptRecord:
@@ -164,7 +197,7 @@ def base_feature_indices(font, script_tag):
     ls=get_langsys(g,script_tag,"ZHS ") or get_langsys(g,script_tag,None) or get_langsys(g,"DFLT",None)
     return list(ls.FeatureIndex) if ls else []
 
-def build_master(weight,style,unicodes,en_cps):
+def build_master(weight,style,unicodes,western_cps):
     src={r:instance(path,weight) for r,(_,path) in REGIONS.items()}
     h=instance(HANKEN,weight); z=TTFont(ZFILES[weight])
     n=src["SC"]
@@ -172,6 +205,8 @@ def build_master(weight,style,unicodes,en_cps):
     for r in ("TC","JP","KR"):
         subset_punct(src[r],unicodes)
 
+    if n.getBestCmap()[0x00B7]==n.getBestCmap()[0x2022]:
+        split_encoded_glyph(n,0x2022,"u2022")
     order=list(n.getGlyphOrder()); cmap=n.getBestCmap()
     zc=z.getBestCmap(); hc=h.getBestCmap()
 
@@ -225,29 +260,41 @@ def build_master(weight,style,unicodes,en_cps):
         vert_i=append_single_feature(n,"vert",vertmap) if vertmap else None
         vrt2_i=append_single_feature(n,"vrt2",vrt2map) if vrt2map else None
 
+        aliases=CJK_LANGUAGE_ALIASES[r]
         for stag in sorted(set(scripts_with_lang(sf,lang)) | {"DFLT"}):
             base_idx=base_feature_indices(n,stag)
             generic=[i for i in base_idx if g.FeatureList.FeatureRecord[i].FeatureTag not in ("locl","vert","vrt2")]
             custom=generic+[loc_i]+([vert_i] if vert_i is not None else [])+([vrt2_i] if vrt2_i is not None else [])
-            set_langsys(get_script(g,stag,create=True),lang,custom)
+            script=get_script(g,stag,create=True)
+            for alias in aliases:
+                set_langsys(script,alias,custom)
 
-    enmap={}
-    for cp in en_cps:
+    westmap={}
+    for cp in western_cps:
         if cp not in cmap or cp not in hc: continue
-        base=cmap[cp]; alt=f"{base}.en"; k=2
+        base=cmap[cp]; alt=f"{base}.west"; k=2
         while alt in order:
-            alt=f"{base}.en{k}"; k+=1
-        order.append(alt); copy_glyph(n,h,hc[cp],alt); enmap[base]=alt
+            alt=f"{base}.west{k}"; k+=1
+        order.append(alt); copy_glyph(n,h,hc[cp],alt); westmap[base]=alt
     n.setGlyphOrder(order)
-    eng_i=append_single_feature(n,"locl",enmap)
-    for stag in ("DFLT","latn"):
-        base_idx=base_feature_indices(n,stag)
-        generic=[i for i in base_idx if g.FeatureList.FeatureRecord[i].FeatureTag not in ("locl","ccmp")]
-        set_langsys(get_script(g,stag,create=True),"ENG ",generic+[eng_i])
+    western_i=append_single_feature(n,"locl",westmap)
+    for stag in WESTERN_SCRIPT_TAGS:
+        script=get_script(g,stag,create=True)
+        for lang in WESTERN_LANGUAGE_SYSTEMS[stag]:
+            # Western paths expose only the Hanken punctuation substitution.
+            # This prevents Noto ccmp/dlig/width/vertical substitutions from
+            # replacing Hanken punctuation after locl has selected it.
+            set_langsys(script,lang,[western_i])
 
     sc_zhs=get_langsys(g,"hani","ZHS ")
     if sc_zhs is not None:
-        set_langsys(get_script(g,"DFLT",create=True),"ZHS ",list(sc_zhs.FeatureIndex))
+        for stag in scripts_with_lang(n,"ZHS "):
+            source=get_langsys(g,stag,"ZHS ")
+            if source is None: continue
+            for alias in CJK_LANGUAGE_ALIASES["SC"]:
+                set_langsys(get_script(g,stag,create=True),alias,list(source.FeatureIndex))
+        for alias in CJK_LANGUAGE_ALIASES["SC"]:
+            set_langsys(get_script(g,"DFLT",create=True),alias,list(sc_zhs.FeatureIndex))
         # No language/region metadata deliberately behaves like SC.
         for stag in ("DFLT","hani","kana","latn","cyrl","grek"):
             script=get_script(g,stag,create=True)
@@ -272,8 +319,14 @@ def main():
         f=TTFont(p); cmaps[r]=f.getBestCmap(); f.close()
     shared=set.intersection(*(set(cmaps[r]) for r in REGIONS))
     unicodes=sorted(cp for cp in shared if unicodedata.category(chr(cp)).startswith("P") and cp!=0x002D)
+    assert not set(range(0x30,0x3A)) & set(unicodes), "ASCII digits must never enter the punctuation bridge"
     hf=TTFont(HANKEN); hc=hf.getBestCmap(); hf.close()
-    en_cps=[cp for cp in (0x00B7,0x2013,0x2014,0x2018,0x2019,0x201C,0x201D,0x2026) if cp in hc and cp in unicodes]
+    western_cps=sorted(set(hc) & set(unicodes))
+    if tuple(western_cps)!=HANKEN_SHARED_PUNCTUATION:
+        raise SystemExit(
+            "Pinned Google Fonts Hanken punctuation overlap changed:\n"
+            f"expected {len(HANKEN_SHARED_PUNCTUATION)}, got {len(western_cps)}"
+        )
 
     # Cache punctuation-only variable sources. This keeps local builds fast while preserving layout closure.
     subset_dir=WORK/"upstream-subsets"; subset_dir.mkdir(exist_ok=True)
@@ -285,7 +338,7 @@ def main():
 
     masters=[]
     for w,s in MASTER_WEIGHTS.items():
-        p=build_master(w,s,unicodes,en_cps); masters.append((w,s,p)); print("master",w,p.stat().st_size,flush=True)
+        p=build_master(w,s,unicodes,western_cps); masters.append((w,s,p)); print("master",w,p.stat().st_size,flush=True)
 
     ds=DesignSpaceDocument()
     ax=AxisDescriptor(); ax.name="Weight"; ax.tag="wght"; ax.minimum=100; ax.default=400; ax.maximum=900; ds.addAxis(ax)

@@ -2,6 +2,7 @@
 from pathlib import Path
 from fontTools.ttLib import TTFont
 import sys
+from language_systems import WESTERN_LANGUAGE_SYSTEMS, WESTERN_SCRIPT_TAGS
 
 def _langsys(gsub,script,lang):
  for sr in gsub.ScriptList.ScriptRecord:
@@ -53,9 +54,11 @@ def check_font(path):
    assert len(v)==1,(path,text,lang,'vertical not ligated',v)
    expected='horizontal' if lang=='KOR ' and count==1 else 'vertical'
    assert _orientation(f,v[0])==expected,(path,text,lang,'vertical orientation',v,_orientation(f,v[0]),expected)
-  eng=_shape(f,text,'latn','ENG ',False)
-  assert len(eng)==count,(path,text,'ENG unexpectedly ligated',eng)
-  assert all(_orientation(f,g)=='horizontal' for g in eng)
+  for script in WESTERN_SCRIPT_TAGS:
+   for lang in WESTERN_LANGUAGE_SYSTEMS[script]:
+    western=_shape(f,text,script,lang,False)
+    assert len(western)==count,(path,text,script,lang,'unexpectedly ligated',western)
+    assert all(_orientation(f,g)=='horizontal' for g in western)
  f.close()
 
 def main():

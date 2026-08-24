@@ -10,7 +10,7 @@ SOURCES={
  'NotoSansJP-wght.ttf':('https://raw.githubusercontent.com/google/fonts/295d98a7a0c17c68f1341eaeea354e7960ea70d3/ofl/notosansjp/NotoSansJP%5Bwght%5D.ttf','c2f3b4d463500a2ddcd3849cded1fceeb9fd6d1c32e6cbecd568453ba50fc68f'),
  'NotoSansKR-wght.ttf':('https://raw.githubusercontent.com/google/fonts/4efc2774c63917927efe769ca845def6bd6debae/ofl/notosanskr/NotoSansKR%5Bwght%5D.ttf','194018e6b2b293a7964f037b25c0249ce1418bc9ab3c971060a03aa57861e252'),
  'HankenGrotesk-wght.ttf':('https://raw.githubusercontent.com/google/fonts/714891563e901b1a0d8ebcaaa003b01604793888/ofl/hankengrotesk/HankenGrotesk%5Bwght%5D.ttf','813b3f8fa0965405669a89b38e51bbefd95eef6b8e20d1cb2d8c10cce062662f'),
- 'Zhudou.Sans-v2.000.zip':('https://github.com/Buernia/Zhudou-Sans/releases/download/v2.000/Zhudou.Sans-v2.000.zip','1a2718aa52c98d1ac7e18d60e0f1d61057b18e558e8196a3a770104855a6fc69'),
+ 'Zhudou.Sans.zip':('https://github.com/Buernia/Zhudou-Sans/releases/download/v2.000/Zhudou.Sans.zip','1a2718aa52c98d1ac7e18d60e0f1d61057b18e558e8196a3a770104855a6fc69'),
 }
 for name,(url,want) in SOURCES.items():
  p=UP/name
@@ -19,7 +19,7 @@ for name,(url,want) in SOURCES.items():
  got=hashlib.sha256(p.read_bytes()).hexdigest()
  if got!=want: raise SystemExit(f'{name}: SHA-256 mismatch: {got}')
  print('ok',name,got)
-z=UP/'Zhudou.Sans-v2.000.zip'; dest=UP/'zhudou'
+z=UP/'Zhudou.Sans.zip'; dest=UP/'zhudou'
 if not dest.exists():
  with zipfile.ZipFile(z) as f: f.extractall(dest)
 print('sources ready:',UP)
