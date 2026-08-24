@@ -1,38 +1,96 @@
 # CJK Punct Bridge
 
-A compact language-aware CJK punctuation bridge font intended to sit before a normal Latin/CJK font stack.
+**CJK Punct Bridge is a small, language-aware punctuation font for mixed CJK and Western typography.** Put it at the front of a CSS font stack, set the correct language on the document, and let it select punctuation forms for Simplified Chinese, Traditional Chinese, Japanese, Korean, or explicit Western-language runs.
 
-The bridge deliberately contains no ASCII digits. `0`–`9` therefore always come from the following Hanken Grotesk face, regardless of the active default, Western, or CJK language system; language selection changes punctuation only.
+> This is a punctuation companion, not a standalone text typeface. It intentionally leaves letters, CJK ideographs, kana, Hangul, and ASCII digits to the fonts that follow it in the stack.
 
-## Behavior
+## Why use a bridge font?
 
-- **No language/region tag defaults to Simplified Chinese (SC)** punctuation behavior.
-- Simplified Chinese (`ZHS`, including phonetic `ZHP`) uses Google Fonts **Noto Sans SC** punctuation; Traditional Chinese (`ZHT`, Hong Kong `ZHH`, Macao `ZHTM`), Japanese (`JAN`), and Korean (`KOR`, including old Hangul `KOH`) switch to punctuation outlines taken from the corresponding Google Fonts Noto Sans regional distributions through `locl`.
-- `U+2014 —`, `U+2E3A ⸺`, and `U+2E3B ⸻` use **Zhudou-derived** dash outlines on the SC and TC Chinese paths.
-- Noto punctuation shaping is retained, including `ccmp`, `dlig`, width features, `vert`, and `vrt2`. Repeated `U+2014` therefore keeps the continuous two-em/three-em behavior on CJK paths.
-- Supported explicit Western languages in Common (`DFLT`), Latin, Cyrillic, and Greek script runs switch every bridge punctuation character also covered by Google Fonts **Hanken Grotesk** to the Hanken glyph through `locl`. Western paths expose no Noto punctuation substitutions, so all 46 shared punctuation characters remain Hanken-derived. Every default LangSys still uses Noto SC.
-- Vertical metrics are retained. Regional vertical punctuation forms are selected after regional `locl` where the Noto source provides them.
+Many punctuation characters share the same Unicode code points across languages even though their preferred shapes, widths, and placement differ. A normal fallback stack cannot choose a different font for the same code point based on language alone.
 
-## Downloads
+CJK Punct Bridge solves that problem with OpenType language systems and `locl` substitutions:
 
-Prebuilt fonts are distributed through **GitHub Releases** rather than committed directly to source history:
+- CJK language tags select punctuation from the corresponding Google Fonts Noto Sans regional source.
+- Explicit Western language tags select Hanken Grotesk forms for all 46 punctuation characters shared with Hanken.
+- A missing or unspecified language intentionally falls back to Simplified Chinese punctuation.
 
-- variable TTF (`wght` 100–900);
-- nine static TTF weights;
-- variable WOFF2 for web use.
+## Quick start
 
-## CSS
+Download the latest files from [GitHub Releases](https://github.com/Speechlessmanbilibili/CJK-Punct-Bridge/releases/latest). The release includes:
+
+- `CJKPunctBridge-Variable.woff2` for the web, with a `wght` axis from 100 to 900;
+- `CJKPunctBridge-Variable.ttf` for desktop use;
+- nine static TTF weights from Thin 100 through Black 900.
+
+Declare the web font and place it before the Latin and CJK families:
 
 ```css
-font-family: "CJK Punct Bridge", "Hanken Grotesk", "Noto Sans SC", sans-serif;
+@font-face {
+  font-family: "CJK Punct Bridge";
+  src: url("./CJKPunctBridge-Variable.woff2") format("woff2-variations");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+body {
+  font-family:
+    "CJK Punct Bridge",
+    "Hanken Grotesk",
+    "Noto Sans SC",
+    sans-serif;
+  font-feature-settings: "locl" 1;
+}
 ```
 
-Set the correct HTML `lang` value so shaping engines can select the appropriate OpenType language system. With no language metadata the bridge intentionally falls back to SC; explicit CJK regions use their Noto regional source, while explicit Latin/Cyrillic/Greek languages use Hanken punctuation where Hanken has coverage.
+Then provide accurate language metadata:
 
-## Building
+```html
+<p lang="zh-CN">简体中文，使用简体中文标点。</p>
+<p lang="zh-TW">繁體中文，使用繁體中文標點。</p>
+<p lang="ja">日本語の句読点。</p>
+<p lang="ko">한국어 문장 부호.</p>
+<p lang="en">English punctuation from Hanken Grotesk.</p>
+```
 
-Upstream binaries are **not committed**. `scripts/fetch_sources.py` can prefetch the exact pinned inputs into the gitignored `upstream/` directory; after that `scripts/build.py` is fully offline. All Noto Sans and Hanken Grotesk inputs come from pinned commits in the **Google Fonts** repository. See `BUILDING.md` and `SOURCES.md`.
+Browsers and shaping engines can only activate the intended language system when the surrounding application supplies language information.
+
+## Source-selection policy
+
+| Text language or shaping path | Punctuation source |
+| --- | --- |
+| No language / default LangSys | Google Fonts Noto Sans SC |
+| Simplified or phonetic Chinese (`ZHS`, `ZHP`) | Google Fonts Noto Sans SC |
+| Traditional Chinese, Hong Kong, or Macao (`ZHT`, `ZHH`, `ZHTM`) | Google Fonts Noto Sans TC |
+| Japanese (`JAN`) | Google Fonts Noto Sans JP |
+| Korean or old Hangul (`KOR`, `KOH`) | Google Fonts Noto Sans KR |
+| Configured explicit Western languages in Common, Latin, Cyrillic, or Greek runs | Google Fonts Hanken Grotesk where covered |
+
+The configured Western paths cover the project locales, a broad modern and historic language set, and every explicit language system present in the pinned Hanken source. Script defaults are never changed to Western punctuation.
+
+## Typography details
+
+- The Western `locl` path covers all 46 bridge punctuation characters also present in Hanken Grotesk.
+- `U+2014 —`, `U+2E3A ⸺`, and `U+2E3B ⸻` use Zhudou-derived dash outlines on the Simplified and Traditional Chinese paths.
+- Repeated `U+2014` retains continuous two-em and three-em dash behavior on default and CJK paths; Western paths retain separate Hanken em dashes.
+- Noto punctuation shaping is preserved, including `ccmp`, `dlig`, width features, `vert`, and `vrt2`.
+- Regional vertical forms and vertical metrics are retained where the Noto source provides them.
+- `U+002D` hyphen-minus is deliberately left to the normal Latin font.
+- ASCII digits `U+0030`–`U+0039` are deliberately absent, so `0`–`9` always fall through to Hanken Grotesk in the recommended stack.
+
+## Reproducible builds
+
+Release binaries are generated from pinned, hash-verified sources and are not committed to normal source history.
+
+```bash
+python scripts/fetch_sources.py
+python scripts/build.py
+python scripts/audit_release.py fonts/static/CJKPunctBridge-Regular.ttf fonts/variable/CJKPunctBridge-Variable.ttf
+python scripts/check_dash_matrix.py fonts/static/CJKPunctBridge-Regular.ttf fonts/variable/CJKPunctBridge-Variable.ttf
+```
+
+After the networked fetch step, the build is fully offline. Noto Sans SC/TC/JP/KR and Hanken Grotesk come exclusively from pinned files in the Google Fonts repository. See [BUILDING.md](BUILDING.md), [SOURCES.md](SOURCES.md), and [FONTLOG.md](FONTLOG.md) for the merge policy, immutable source hashes, and release history.
 
 ## License
 
-CJK Punct Bridge is distributed under the **SIL Open Font License 1.1**. It is a modified/combined font and is not an official release of Hanken Grotesk, Noto/Source Han, or Zhudou Sans. See `OFL.txt` and `THIRD_PARTY_NOTICES.md`.
+CJK Punct Bridge is distributed under the [SIL Open Font License 1.1](OFL.txt). It is a modified and combined font, not an official release of Hanken Grotesk, Noto/Source Han, or Zhudou Sans. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for attribution.
