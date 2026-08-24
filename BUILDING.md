@@ -22,6 +22,29 @@ python scripts/check_dash_matrix.py fonts/static/CJKPunctBridge-Regular.ttf font
 
 Outputs are written under `fonts/static/`, `fonts/variable/`, and `fonts/web/`; release binaries remain outside normal Git history.
 
+## 3. Italic family
+
+The italic family is a separate single-axis variable font plus nine static
+italics, mirroring the pinned Hanken Grotesk release layout (upright and
+italic are distinct `wght`-only variable files sharing the typographic family
+name). Build it with:
+
+```bash
+CJK_PUNCT_ITALIC=1 python scripts/build.py
+```
+
+This emits `fonts/variable/CJKPunctBridge-Italic-Variable.ttf`,
+`fonts/web/CJKPunctBridge-Italic-Variable.woff2`, and the nine
+`fonts/static/CJKPunctBridge-*Italic.ttf` faces.
+
+In italics, the Western punctuation comes from the pinned Google Fonts
+**Hanken Grotesk Italic** distribution (true italic designs), while the CJK
+regional punctuation and Zhudou dashes use a uniform synthetic 10-degree shear
+(`scripts/build.py` `shear_font()`): simple glyphs keep their exact point
+structure and flags so varLib masters stay interpolatable, composites are
+decomposed identically on every master, advance widths stay unchanged, and
+left side bearings are recomputed from the new bounds.
+
 ## Merge strategy
 
 1. Determine punctuation code points shared by the four Google Fonts Noto CJK distributions; `U+002D` hyphen-minus remains with the normal Latin font.
@@ -31,7 +54,7 @@ Outputs are written under `fonts/static/`, `fonts/variable/`, and `fonts/web/`; 
 4. Copy the final localized punctuation outlines from Noto Sans TC/JP/KR and attach them to the corresponding Chinese, Japanese, and Korean `locl` language systems, including registered Hong Kong, Macao, phonetic-Chinese, and old-Hangul aliases. Regional vertical targets are copied and attached through `vert` / `vrt2`.
 5. Replace Chinese SC/TC one-em/two-em/three-em dash outlines with Zhudou-derived horizontal and vertical forms while retaining the Noto continuous-dash machinery.
 6. Compute the full punctuation intersection between the bridge and pinned Google Fonts Hanken Grotesk (currently 46 code points). For every configured explicit Western language under `DFLT`, `latn`, `cyrl`, or `grek`, attach those Hanken alternates through `locl` and expose no Noto punctuation substitutions. Every default language system remains Noto SC, and explicit CJK tags remain on their corresponding Noto regional paths.
-7. Build five static masters, interpolate a `wght` 100–900 variable TTF, instantiate nine static weights, and emit WOFF2.
+7. Build five static masters, interpolate a `wght` 100–900 variable TTF, instantiate nine static weights, and emit WOFF2. The italic family follows the same pipeline with Hanken Grotesk Italic as the Western source and a synthetic shear applied to the CJK sources.
 
 The regional Google Fonts Noto punctuation subsets retain the same relevant punctuation GSUB feature set after subsetting; Korean-only extra shaping lookups outside punctuation are removed by the punctuation closure and are not needed by this bridge.
 

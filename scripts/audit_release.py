@@ -40,7 +40,10 @@ def singlemap(font,script,lang,feature):
 
 def audit(path):
  f=TTFont(path); cmap=f.getBestCmap()
- unique_id='CJKPunctBridge-VF' if 'fvar' in f else path.stem
+ if 'fvar' in f:
+  unique_id='CJKPunctBridge-Italic-VF' if 'Italic' in path.name else 'CJKPunctBridge-VF'
+ else:
+  unique_id=path.stem
  audit_metadata(f,unique_id)
  assert len(cmap)>=180
  assert not set(range(0x30,0x3A)) & set(cmap),(path,'ASCII digits must be supplied by Hanken, not the bridge')
@@ -74,6 +77,12 @@ def audit(path):
   a=next(x for x in f['fvar'].axes if x.axisTag=='wght')
   assert (a.minValue,a.defaultValue,a.maxValue)==(100.0,400.0,900.0)
   assert len(f['fvar'].instances)==9
+ italic=bool(f['OS/2'].fsSelection & 1)
+ if italic:
+  assert f['head'].macStyle & 2,(path,'italic macStyle missing')
+  assert f['post'].italicAngle<0,(path,'italicAngle not negative')
+  sub=f['name'].getDebugName(2)
+  assert sub and sub.endswith('Italic'),(path,'subfamily',sub)
  f.close()
 
 def glyph_signature(font,glyph):
@@ -95,8 +104,11 @@ if __name__=='__main__':
  import sys
  root=Path(__file__).resolve().parents[1]
  hanken=root/'upstream'/'HankenGrotesk-wght.ttf'
+ hanken_italic=root/'upstream'/'HankenGrotesk-Italic-wght.ttf'
  for arg in sys.argv[1:]:
   path=Path(arg);audit(path)
   if hanken.exists() and path.name=='CJKPunctBridge-Regular.ttf':
    audit_hanken_provenance(path,hanken)
+  if hanken_italic.exists() and path.name=='CJKPunctBridge-Italic.ttf':
+   audit_hanken_provenance(path,hanken_italic)
   print('OK',arg)

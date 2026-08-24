@@ -22,6 +22,16 @@ Download the latest files from [GitHub Releases](https://github.com/Speechlessma
 - `CJKPunctBridge-Variable.ttf` for desktop use;
 - nine static TTF weights from Thin 100 through Black 900.
 
+An italic family ships alongside, as a separate `wght`-only variable font plus
+nine static italics — the same layout as the pinned Hanken Grotesk release:
+`CJKPunctBridge-Italic-Variable.woff2` / `.ttf`, and `CJKPunctBridge-Italic.ttf`,
+`CJKPunctBridge-ThinItalic.ttf`, …, `CJKPunctBridge-BlackItalic.ttf`.
+
+In italics, Western punctuation uses the true Hanken Grotesk Italic designs;
+CJK punctuation uses a uniform synthetic 10-degree slant (no true CJK italic
+design exists). Install or declare both families under the shared
+**CJK Punct Bridge** name to get upright and italic styles.
+
 Declare the web font and place it before the Latin and CJK families:
 
 ```css
@@ -29,6 +39,13 @@ Declare the web font and place it before the Latin and CJK families:
   font-family: "CJK Punct Bridge";
   src: url("./CJKPunctBridge-Variable.woff2") format("woff2-variations");
   font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "CJK Punct Bridge";
+  src: url("./CJKPunctBridge-Italic-Variable.woff2") format("woff2-variations");
+  font-style: italic;
   font-weight: 100 900;
   font-display: swap;
 }
@@ -85,6 +102,7 @@ Release binaries are generated from pinned, hash-verified sources and are not co
 ```bash
 python scripts/fetch_sources.py
 python scripts/build.py
+CJK_PUNCT_ITALIC=1 python scripts/build.py
 python scripts/audit_release.py fonts/static/CJKPunctBridge-Regular.ttf fonts/variable/CJKPunctBridge-Variable.ttf
 python scripts/check_dash_matrix.py fonts/static/CJKPunctBridge-Regular.ttf fonts/variable/CJKPunctBridge-Variable.ttf
 ```
