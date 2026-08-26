@@ -45,6 +45,27 @@ structure and flags so varLib masters stay interpolatable, composites are
 decomposed identically on every master, advance widths stay unchanged, and
 left side bearings are recomputed from the new bounds.
 
+Italic outputs use Office-compatible style linking: `OS/2.fsSelection`
+contains `ITALIC` without `REGULAR`; Bold Italic contains `ITALIC + BOLD`.
+Legacy name ID 2 carries the linked style while typographic name ID 17 retains
+the complete weight and posture.
+
+## 4. Interrobang variant
+
+After both base variable fonts exist, place the pinned Inter 4.001 inputs from
+`SOURCES.md` in `upstream/` or set `INTER_VF` explicitly:
+
+```bash
+INTER_VF=upstream/InterVariable.ttf python scripts/build_interrobang.py
+CJK_PUNCT_ITALIC=1 INTER_VF=upstream/InterVariable-Italic.ttf python scripts/build_interrobang.py
+```
+
+Each pass builds nine static faces and one variable font under
+`fonts-interrobang/`. Inter U+203D is instantiated at the matching weight for
+every master. Validation requires nine distinct outlines, matching
+variable/static endpoints, fewer than 60,000 glyphs, and a `gvar` table below
+64 MiB.
+
 ## Merge strategy
 
 1. Determine punctuation code points shared by the four Google Fonts Noto CJK distributions; `U+002D` hyphen-minus remains with the normal Latin font.

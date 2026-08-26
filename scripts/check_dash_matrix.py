@@ -16,7 +16,7 @@ def _apply(glyphs,lookup):
  out=glyphs[:]
  for st in lookup.SubTable:
   typ=lookup.LookupType
-  if typ==7: st=st.ExtSubTable; typ=st.ExtensionLookupType
+  if typ==7: typ=st.ExtensionLookupType; st=st.ExtSubTable
   if typ==1 and hasattr(st,'mapping'): out=[st.mapping.get(g,g) for g in out]
   elif typ==4:
    ligs=getattr(st,'ligatures',{}); result=[]; i=0

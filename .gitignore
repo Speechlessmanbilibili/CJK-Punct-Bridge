@@ -4,7 +4,7 @@ dist/
 fonts/static/
 fonts/variable/
 fonts/web/
+fonts-interrobang/
 __pycache__/
 *.pyc
 .DS_Store
-fonts-interrobang/

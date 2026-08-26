@@ -118,27 +118,27 @@ def setname(nt,nid,val):
 def set_static_names(f,w,style,italic=False):
     nt=f["name"]
     if italic:
-        sub="Italic" if w==400 else f"{style} Italic"
+        typographic_sub="Italic" if w==400 else f"{style} Italic"
         legacy_family=FAMILY if w in (400,700) else f"{FAMILY} {style}"
         legacy_sub="Bold Italic" if w==700 else "Italic"
         full=FAMILY if w==400 else f"{FAMILY} {style}"
         full=f"{full} Italic"
         unique=f"{PS}-Italic" if w==400 else f"{PS}-{style}Italic"
     else:
-        sub="Bold" if w==700 else "Regular"
+        typographic_sub=style
         legacy_family=FAMILY if w in (400,700) else f"{FAMILY} {style}"
-        legacy_sub=sub
+        legacy_sub="Bold" if w==700 else "Regular"
         full=FAMILY if w==400 else f"{FAMILY} {style}"
         unique=f"{PS}-{style}"
-    vals={**project_names(unique),1:legacy_family,2:sub,
-          4:full,6:unique,16:FAMILY,17:(sub if italic else style),25:PS}
+    vals={**project_names(unique),1:legacy_family,2:legacy_sub,
+          4:full,6:unique,16:FAMILY,17:typographic_sub,25:PS}
     for k,v in vals.items(): setname(nt,k,v)
     apply_binary_metadata(f)
     o=f["OS/2"]; o.usWeightClass=w
     fs=o.fsSelection
     for bit in (0,5,6,9): fs &= ~(1<<bit)
     if italic: fs|=1<<0
-    if w==400: fs|=1<<6
+    if w==400 and not italic: fs|=1<<6
     if w==700: fs|=1<<5
     o.fsSelection=fs
     f["head"].macStyle &= ~3
@@ -189,6 +189,14 @@ def build_vf(masters, italic=False):
                 6:f"{PS}{'-Italic' if italic else ''}",16:FAMILY,17:sub,25:PS}.items():
         setname(nt,k,v)
     apply_binary_metadata(vf)
+    o=vf["OS/2"]; o.usWeightClass=400
+    fs=o.fsSelection
+    for bit in (0,5,6,9): fs &= ~(1<<bit)
+    if italic: fs|=1<<0
+    else: fs|=1<<6
+    o.fsSelection=fs
+    vf["head"].macStyle &= ~3
+    if italic: vf["head"].macStyle |= 2
     names=[]
     for w,s in ALL_WEIGHTS.items():
         names.append("Italic" if (italic and w==400) else s+(" Italic" if italic else ""))
@@ -232,7 +240,7 @@ def split_encoded_glyph(font,cp,suffix):
             for subtable in lookup.SubTable:
                 typ=lookup.LookupType
                 if typ==7:
-                    subtable=subtable.ExtSubTable; typ=subtable.ExtensionLookupType
+                    typ=subtable.ExtensionLookupType; subtable=subtable.ExtSubTable
                 if typ==1 and hasattr(subtable,"mapping") and base in subtable.mapping:
                     subtable.mapping[duplicate]=subtable.mapping[base]
     return duplicate
@@ -290,7 +298,7 @@ def feature_single_map(font, script, lang, tag):
             for st in lk.SubTable:
                 typ=lk.LookupType
                 if typ==7:
-                    st=st.ExtSubTable; typ=st.ExtensionLookupType
+                    typ=st.ExtensionLookupType; st=st.ExtSubTable
                 if typ==1 and hasattr(st,"mapping"):
                     out.update(st.mapping)
     return out

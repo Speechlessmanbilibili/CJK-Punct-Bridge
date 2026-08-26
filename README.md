@@ -115,25 +115,27 @@ Releases also carry an optional companion family, **CJK Punct Bridge ?!**, that
 ligates question/exclamation pairs into the interrobang: `?!` and `!?` become
 `‽` (U+203D), while full-width `？！` and `！？` become a full-width interrobang,
 aligned left like other full-width CJK punctuation. The ligatures are on by
-default (`liga`) and cover every regional `locl` variant of `?` and `!`. The
-interrobang outline is taken from Inter's U+203D design.
+default (`liga`) and cover every regional `locl` variant of `?` and `!`. Each
+master uses Inter 4.001's U+203D outline instantiated at the matching `wght`,
+so Thin through Black have genuinely different interrobang outlines.
 
 This variant is an attachment, not the main product: the standard family
 described above remains the default distribution and the primary subject of
 this documentation. The variant ships as its own family
 (`CJKPunctBridgeInterrobang-*`) with upright and italic variable fonts plus
 nine static weights each, so it can be installed or removed independently.
+The release attachment is named `CJKPunctBridgeInterrobang-v1.3.2.zip`.
 Build it from the standard statics with:
 
 ```bash
-python scripts/build_interrobang.py                          # upright statics
-python scripts/build_variable_interrobang.py                 # upright VF
-CJK_PUNCT_ITALIC=1 python scripts/build_interrobang.py       # italic statics
-CJK_PUNCT_ITALIC=1 python scripts/build_variable_interrobang.py  # italic VF
+python scripts/build_interrobang.py                     # upright statics + VF
+CJK_PUNCT_ITALIC=1 python scripts/build_interrobang.py  # italic statics + VF
 ```
 
-The interrobang glyph source is an Inter variable font passed via the
-`INTER_VF` environment variable.
+The interrobang glyph source is a hash-pinned Inter variable font passed via
+`INTER_VF` or placed in `upstream/`. The build rejects repeated weight outlines,
+variable/static endpoint drift, 60,000 or more glyphs, and a `gvar` table at or
+above 64 MiB.
 
 ## License
 

@@ -15,6 +15,8 @@ from fontTools.otlLib.builder import buildStatTable
 from fontTools.ttLib import TTFont
 from fontTools.varLib import build as varlib_build
 from fontTools.varLib.instancer import instantiateVariableFont
+from font_metadata import apply_binary_metadata, project_names
+from build_interrobang import INTER_LEGAL
 
 REPO = Path(__file__).resolve().parents[1]
 STATIC = REPO / "fonts-interrobang" / "static"
@@ -46,19 +48,24 @@ def setname(table, name_id, value):
 def set_names(font):
     names = font["name"]
     sub = "Italic" if ITALIC else "Regular"
+    unique = f"{PS}-Italic-VF" if ITALIC else f"{PS}-VF"
     values = {
+        **project_names(unique),
+        **INTER_LEGAL,
         1: FAMILY, 2: sub, 4: FAMILY + (f" {sub}" if ITALIC else ""),
         6: f"{PS}{'-Italic' if ITALIC else ''}", 16: FAMILY, 17: sub, 25: PS,
     }
     for nid, val in values.items():
         setname(names, nid, val)
+    apply_binary_metadata(font)
     os2 = font["OS/2"]
     os2.usWeightClass = 400
     for bit in (0, 5, 6, 9):
         os2.fsSelection &= ~(1 << bit)
-    os2.fsSelection |= 1 << 6
     if ITALIC:
         os2.fsSelection |= 1 << 0
+    else:
+        os2.fsSelection |= 1 << 6
     font["head"].macStyle &= ~3
     if ITALIC:
         font["head"].macStyle |= 2
@@ -120,7 +127,7 @@ def main():
 
     variable, _, _ = varlib_build(str(dsp), exclude=["BASE", "GDEF", "GPOS", "GSUB"])
     reg = TTFont(paths[400])
-    for tag in ("GDEF", "GPOS", "GSUB"):
+    for tag in ("GDEF", "GPOS", "GSUB", "prep"):
         if tag in reg:
             table = deepcopy(reg[tag])
             if hasattr(table, "VarStore") and table.VarStore is not None:

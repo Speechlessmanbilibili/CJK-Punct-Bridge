@@ -34,7 +34,7 @@ def singlemap(font,script,lang,feature):
    lk=t.LookupList.Lookup[li]
    for st in lk.SubTable:
     typ=lk.LookupType
-    if typ==7: st=st.ExtSubTable; typ=st.ExtensionLookupType
+    if typ==7: typ=st.ExtensionLookupType; st=st.ExtSubTable
     if typ==1 and hasattr(st,'mapping'): out.update(st.mapping)
  return out
 
@@ -78,7 +78,9 @@ def audit(path):
   assert (a.minValue,a.defaultValue,a.maxValue)==(100.0,400.0,900.0)
   assert len(f['fvar'].instances)==9
  italic=bool(f['OS/2'].fsSelection & 1)
+ regular=bool(f['OS/2'].fsSelection & (1<<6))
  if italic:
+  assert not regular,(path,'italic and regular fsSelection bits conflict')
   assert f['head'].macStyle & 2,(path,'italic macStyle missing')
   assert f['post'].italicAngle<0,(path,'italicAngle not negative')
   sub=f['name'].getDebugName(2)

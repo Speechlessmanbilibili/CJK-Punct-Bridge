@@ -1,5 +1,12 @@
 # FONTLOG
 
+## 1.320 — 2026-08-27
+
+- Corrected upright/italic family metadata in both the standard and optional `?!` builds: italic faces now set `ITALIC` and clear `REGULAR`, while Bold Italic sets only `ITALIC + BOLD`.
+- Corrected legacy subfamily names separately from typographic subfamily names so Office/GDI links Regular, Bold, Italic, and Bold Italic without losing the full weight name.
+- Rebuilt the optional `?!` family from weight-matched Inter 4.001 instances instead of reusing the default 400 `U+203D` outline for every master.
+- Added nine-weight outline, variable/static endpoint, glyph-count, and 64 MiB `gvar` validation for the optional variable fonts.
+
 ## 1.310 — 2026-08-26
 
 - Added an optional companion family, **CJK Punct Bridge ?!**, shipped as a release attachment: `?!`/`!?` ligate to U+203D and full-width `？！`/`！？` ligate to a full-width left-aligned interrobang, enabled by default via `liga` across all regional `locl` variants.

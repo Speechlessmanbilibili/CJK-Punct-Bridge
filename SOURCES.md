@@ -1,6 +1,6 @@
 # Source inputs
 
-Pinned upstream binaries used by v1.3.0. Build-time source files live in the gitignored `upstream/` directory. Noto Sans and Hanken Grotesk are sourced exclusively from the Google Fonts repository distributions shown below.
+Pinned upstream binaries used by v1.3.2. Build-time source files live in the gitignored `upstream/` directory. Noto Sans and Hanken Grotesk are sourced exclusively from the Google Fonts repository distributions shown below.
 
 | Input | Pinned source | SHA-256 |
 | --- | --- | --- |
@@ -11,7 +11,13 @@ Pinned upstream binaries used by v1.3.0. Build-time source files live in the git
 | Google Fonts Hanken Grotesk variable TTF | `google/fonts@714891563e901b1a0d8ebcaaa003b01604793888 / ofl/hankengrotesk/HankenGrotesk[wght].ttf` | `813b3f8fa0965405669a89b38e51bbefd95eef6b8e20d1cb2d8c10cce062662f` |
 | Google Fonts Hanken Grotesk Italic variable TTF | `google/fonts@714891563e901b1a0d8ebcaaa003b01604793888 / ofl/hankengrotesk/HankenGrotesk-Italic[wght].ttf` | `ae5731726ff75301a3cb63f2e98d1babc77d55ab09fb8e229ca75f5bd46fbe32` |
 | Zhudou Sans v2.000 release archive | `Buernia/Zhudou-Sans v2.000 / Zhudou.Sans.zip` | `1a2718aa52c98d1ac7e18d60e0f1d61057b18e558e8196a3a770104855a6fc69` |
+| Inter 4.001 upright variable TTF (`CJK Punct Bridge ?!` only) | Local OFL input `InterVariable.ttf`, internal source revision `git-9221beed3`; set `INTER_VF` or place in `upstream/` | `4989b125924991b90d05b2d16e0e388c48f7d5bb8b30539bbf9c755278d0ccaf` |
+| Inter 4.001 italic variable TTF (`CJK Punct Bridge ?!` only) | Local OFL input `InterVariable-Italic.ttf`, internal source revision `git-9221beed3`; set `INTER_VF` or place in `upstream/` | `d6f1f6a172d9e588438db9f986fd5cfad7b30f644374080a8a9d4d91e344586f` |
 
 `scripts/fetch_sources.py` contains the corresponding immutable download URLs and verifies every hash before extraction/building.
+
+Inter is supplied separately for the optional `?!` family. Its exact hash,
+`opsz`/`wght` axes, and `U+203D` coverage are checked by
+`scripts/build_interrobang.py` before the build starts.
 
 The OpenType language-system policy in `scripts/language_systems.py` uses registered tags from Microsoft's OpenType 1.9 registry, last updated 2024-05-31. It is build metadata only, not a font-outline source.
