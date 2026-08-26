@@ -109,6 +109,32 @@ python scripts/check_dash_matrix.py fonts/static/CJKPunctBridge-Regular.ttf font
 
 After the networked fetch step, the build is fully offline. Noto Sans SC/TC/JP/KR and Hanken Grotesk come exclusively from pinned files in the Google Fonts repository. See [BUILDING.md](BUILDING.md), [SOURCES.md](SOURCES.md), and [FONTLOG.md](FONTLOG.md) for the merge policy, immutable source hashes, and release history.
 
+## Optional interrobang variant
+
+Releases also carry an optional companion family, **CJK Punct Bridge ?!**, that
+ligates question/exclamation pairs into the interrobang: `?!` and `!?` become
+`‽` (U+203D), while full-width `？！` and `！？` become a full-width interrobang,
+aligned left like other full-width CJK punctuation. The ligatures are on by
+default (`liga`) and cover every regional `locl` variant of `?` and `!`. The
+interrobang outline is taken from Inter's U+203D design.
+
+This variant is an attachment, not the main product: the standard family
+described above remains the default distribution and the primary subject of
+this documentation. The variant ships as its own family
+(`CJKPunctBridgeInterrobang-*`) with upright and italic variable fonts plus
+nine static weights each, so it can be installed or removed independently.
+Build it from the standard statics with:
+
+```bash
+python scripts/build_interrobang.py                          # upright statics
+python scripts/build_variable_interrobang.py                 # upright VF
+CJK_PUNCT_ITALIC=1 python scripts/build_interrobang.py       # italic statics
+CJK_PUNCT_ITALIC=1 python scripts/build_variable_interrobang.py  # italic VF
+```
+
+The interrobang glyph source is an Inter variable font passed via the
+`INTER_VF` environment variable.
+
 ## License
 
 CJK Punct Bridge is distributed under the [SIL Open Font License 1.1](OFL.txt). It is a modified and combined font, not an official release of Hanken Grotesk, Noto/Source Han, or Zhudou Sans. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for attribution.

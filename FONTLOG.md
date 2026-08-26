@@ -1,5 +1,11 @@
 # FONTLOG
 
+## 1.310 — 2026-08-26
+
+- Added an optional companion family, **CJK Punct Bridge ?!**, shipped as a release attachment: `?!`/`!?` ligate to U+203D and full-width `？！`/`！？` ligate to a full-width left-aligned interrobang, enabled by default via `liga` across all regional `locl` variants.
+- Sourced the interrobang outline from Inter's U+203D design (half-width extracted, full-width reusing the same contour with a 1000-unit advance); the variant is a separate family (`CJKPunctBridgeInterrobang-*`) with upright and italic variable fonts plus nine static weights each.
+- The standard family remains the default distribution; the interrobang build is documented as an optional attachment.
+
 ## 1.300 — 2026-08-24
 
 - Added a full italic family alongside the upright family, published as a separate single-axis variable font (`CJKPunctBridge-Italic-Variable.ttf`) plus nine static italics, exactly mirroring the pinned Hanken Grotesk release layout.
