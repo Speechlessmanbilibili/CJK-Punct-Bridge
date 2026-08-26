@@ -1,16 +1,17 @@
-Portions Copyright 2021 The Hanken Grotesk Project Authors.
-Portions Copyright 2014-2021 Adobe, with Reserved Font Name 'Source'.
-Portions Copyright 2022 Buernia, with Reserved Font Names 'Zhudou' and '煮豆'; portions Copyright 2015 Google Inc.
-CJK Punct Bridge is a modified/combined font distributed under SIL Open Font License 1.1.
+Copyright 2021 The Hanken Grotesk Project Authors.
+Copyright 2014-2021 Adobe, with Reserved Font Name 'Source'.
+Copyright 2015 Google Inc.
+Copyright 2022 Buernia, with Reserved Font Names 'Zhudou'.
+Modifications copyright 2026 SilentPerson.
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:
 http://scripts.sil.org/OFL
 
+
 -----------------------------------------------------------
 SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
 -----------------------------------------------------------
-
 PREAMBLE
 The goals of the Open Font License (OFL) are to stimulate worldwide
 development of collaborative font projects, to support the font creation
