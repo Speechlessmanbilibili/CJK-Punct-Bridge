@@ -2,7 +2,7 @@ Copyright 2021 The Hanken Grotesk Project Authors.
 Copyright 2014-2021 Adobe, with Reserved Font Name 'Source'.
 Copyright 2015 Google Inc.
 Copyright 2022 Buernia, with Reserved Font Names 'Zhudou'.
-Modifications copyright 2026 SilentPerson.
+Copyright 2026 SilentPerson (Speechlessmanbilibili).
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:
