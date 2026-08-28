@@ -19,6 +19,7 @@ from language_systems import (
     WESTERN_SCRIPT_TAGS,
 )
 from font_metadata import apply_binary_metadata, project_names, VERSION
+from inter_punctuation import replace_public_punctuation
 
 REPO = Path(__file__).resolve().parents[1]
 UP = Path(os.environ.get("CJK_PUNCT_UPSTREAM_DIR", REPO / "upstream"))
@@ -45,12 +46,14 @@ REGIONS={
     "KR": ("KOR ", UP/"NotoSansKR-wght.ttf"),
 }
 HANKEN=UP/"HankenGrotesk-wght.ttf"
+INTER=UP/("InterVariable-Italic.ttf" if ITALIC else "InterVariable.ttf")
 ZDIR=UP/"zhudou"/"ttf"
 ZFILES={100:ZDIR/"ZhudouSans-ExtraLight.ttf",300:ZDIR/"ZhudouSans-Light.ttf",400:ZDIR/"ZhudouSans-Regular.ttf",700:ZDIR/"ZhudouSans-Bold.ttf",900:ZDIR/"ZhudouSans-Heavy.ttf"}
 
 def require_files():
     missing=[str(p) for _,p in REGIONS.values() if not p.exists()]
     if not HANKEN.exists(): missing.append(str(HANKEN))
+    if not INTER.exists(): missing.append(str(INTER))
     missing += [str(p) for p in ZFILES.values() if not p.exists()]
     if missing:
         raise SystemExit("Missing upstream files:\n"+"\n".join(missing))
@@ -435,6 +438,7 @@ def build_master(weight,style,unicodes,western_cps,italic=False):
             ls.FeatureIndex=list(sc_zhs.FeatureIndex); ls.FeatureCount=len(ls.FeatureIndex)
             script.DefaultLangSys=ls
 
+    replace_public_punctuation(n,INTER,weight)
     set_static_names(n,weight,style,italic=italic)
     stat_axes=[dict(tag="wght",name="Weight",values=[dict(value=weight,name=style,flags=0x2 if weight==400 else 0)])]
     if italic:

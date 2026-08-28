@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Build the Interrobang Bridge Western companion family from pinned Inter VFs.
 
-The font intentionally encodes only U+0021, U+003F, and U+203D. Its default
-liga feature maps ?! and !? to the encoded interrobang glyph. Upright and italic
+The font encodes the complete Inter question/exclamation group, including
+inverted and full-width forms plus U+203D. Its default liga feature uses
+contextual 500+0 and 1000+0 pair substitutions. Upright and italic
 passes each emit nine static weights plus one wght variable font.
 """
 from copy import deepcopy
@@ -13,14 +14,16 @@ import os
 from fontTools.designspaceLib import (
     AxisDescriptor, DesignSpaceDocument, InstanceDescriptor, SourceDescriptor,
 )
-from fontTools.otlLib.builder import buildLigatureSubstSubtable, buildLookup, buildStatTable
+from fontTools.otlLib.builder import buildStatTable
 from fontTools.subset import Options, Subsetter
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables import otTables
 from fontTools.varLib import build as varlib_build
 from fontTools.varLib.instancer import instantiateVariableFont
+from fontTools.ttLib.scaleUpem import scale_upem
 
 from font_metadata import apply_binary_metadata, project_names
+from inter_punctuation import add_pair_substitutions, import_interrobang, replace_public_punctuation
 
 REPO = Path(__file__).resolve().parents[1]
 ITALIC = os.environ.get("INTERROBANG_BRIDGE_ITALIC") == "1"
@@ -37,7 +40,7 @@ for directory in (STATIC_OUT, VARIABLE_OUT, WEB_OUT, WORK):
 
 FAMILY = "Interrobang Bridge"
 PS = "InterrobangBridge"
-CODEPOINTS = (0x0021, 0x003F, 0x203D)
+CODEPOINTS = (0x0021, 0x003F, 0x00A1, 0x00BF, 0xFF01, 0xFF1F, 0x203D)
 WEIGHTS = {
     100: "Thin", 200: "ExtraLight", 300: "Light", 400: "Regular",
     500: "Medium", 600: "SemiBold", 700: "Bold", 800: "ExtraBold",
@@ -52,7 +55,7 @@ INTER_LEGAL = {
     7: "Inter UI and Inter is a trademark of rsms.",
     8: "SilentPerson (Speechlessmanbilibili)",
     9: "Rasmus Andersson (Inter); SilentPerson (subset and OpenType engineering).",
-    10: "Minimal Western companion font: Inter question mark, exclamation mark, and interrobang; ?! and !? ligate to U+203D by default.",
+    10: "Inter question/exclamation companion covering upright, inverted, full-width, and interrobang forms; pairs use contextual 500+0 or 1000+0 shaping.",
     11: "https://github.com/Speechlessmanbilibili/CJK-Punct-Bridge",
     12: "https://github.com/Speechlessmanbilibili",
     13: "This Font Software is licensed under the SIL Open Font License, Version 1.1. See OFL.txt.",
@@ -139,7 +142,7 @@ def validate_source():
         raise SystemExit(f"Inter SHA-256 mismatch: {digest}\nexpected: {INTER_SHA256[ITALIC]}")
     font = TTFont(INTER_VF, lazy=True)
     cmap = font.getBestCmap()
-    assert set(CODEPOINTS) <= set(cmap)
+    assert {0x0021, 0x003F, 0x00A1, 0x00BF, 0x203D} <= set(cmap)
     axes = {axis.axisTag: (axis.minValue, axis.defaultValue, axis.maxValue) for axis in font["fvar"].axes}
     assert axes.get("wght") == (100.0, 400.0, 900.0)
     assert "opsz" in axes
@@ -154,17 +157,11 @@ def subset_characters(font):
     options.name_languages = [0x409]
     options.recalc_average_width = True
     subsetter = Subsetter(options=options)
-    subsetter.populate(unicodes=CODEPOINTS)
+    subsetter.populate(unicodes=(0x0021, 0x003F, 0x00A1, 0x00BF, 0x203D))
     subsetter.subset(font)
 
 
-def add_ligatures(font):
-    cmap = font.getBestCmap()
-    mapping = {
-        (cmap[0x003F], cmap[0x0021]): cmap[0x203D],
-        (cmap[0x0021], cmap[0x003F]): cmap[0x203D],
-    }
-    lookup = buildLookup([buildLigatureSubstSubtable(mapping)], table="GSUB")
+def add_empty_liga_feature(font):
     gsub = otTables.GSUB()
     gsub.Version = 0x00010000
     gsub.ScriptList = otTables.ScriptList()
@@ -185,13 +182,13 @@ def add_ligatures(font):
     feature_record.FeatureTag = "liga"
     feature_record.Feature = otTables.Feature()
     feature_record.Feature.FeatureParams = None
-    feature_record.Feature.LookupListIndex = [0]
-    feature_record.Feature.LookupCount = 1
+    feature_record.Feature.LookupListIndex = []
+    feature_record.Feature.LookupCount = 0
     gsub.FeatureList.FeatureRecord = [feature_record]
     gsub.FeatureList.FeatureCount = 1
     gsub.LookupList = otTables.LookupList()
-    gsub.LookupList.Lookup = [lookup]
-    gsub.LookupList.LookupCount = 1
+    gsub.LookupList.Lookup = []
+    gsub.LookupList.LookupCount = 0
     from fontTools.ttLib import newTable
     font["GSUB"] = newTable("GSUB")
     font["GSUB"].table = gsub
@@ -205,8 +202,13 @@ def build_static():
             variable, {"opsz": 14, "wght": weight}, inplace=False, optimize=True, static=True
         )
         variable.close()
+        scale_upem(font, 1000)
         subset_characters(font)
-        add_ligatures(font)
+        replace_public_punctuation(font, INTER_VF, weight)
+        half_name, full_name, zero_name = import_interrobang(font, INTER_VF, weight)
+        # Subsetting removed GSUB; create a minimal liga feature first.
+        add_empty_liga_feature(font)
+        add_pair_substitutions(font, half_name, full_name, zero_name)
         set_names(font, weight)
         buildStatTable(font, [dict(
             tag="wght", name="Weight",
@@ -276,7 +278,7 @@ def build_variable(paths):
     return output
 
 
-def ligature_target(font, first, second):
+def ligature_target_legacy(font, first, second):
     cmap = font.getBestCmap()
     lookup = font["GSUB"].table.LookupList.Lookup[0]
     for ligature in lookup.SubTable[0].ligatures[cmap[first]]:
@@ -301,8 +303,9 @@ def validate(output, paths):
         static = TTFont(path)
         assert set(static.getBestCmap()) == set(CODEPOINTS)
         literal = static.getBestCmap()[0x203D]
-        assert ligature_target(static, 0x003F, 0x0021) == literal
-        assert ligature_target(static, 0x0021, 0x003F) == literal
+        assert static['hmtx'].metrics[literal][0] == 500
+        assert static['hmtx'].metrics[static.getBestCmap()[0xFF01]][0] == 1000
+        assert static['hmtx'].metrics[static.getBestCmap()[0xFF1F]][0] == 1000
         signatures.append(glyph_signature(static, literal))
         if weight in (100, 400, 900):
             instance = instantiateVariableFont(variable, {"wght": weight}, inplace=False, optimize=True, static=True)
@@ -312,7 +315,7 @@ def validate(output, paths):
         static.close()
     assert len(set(signatures)) == len(WEIGHTS), "Interrobang outline does not vary across weights"
     variable.close()
-    print(f"validated {output.name}: cmap=3; 9 distinct Inter weights", flush=True)
+    print(f"validated {output.name}: cmap=7; 9 distinct Inter weights", flush=True)
 
 
 def main():

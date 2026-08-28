@@ -41,6 +41,10 @@ def singlemap(font,script,lang,feature):
 
 def audit(path):
  f=TTFont(path); cmap=f.getBestCmap()
+ for cp in (0x21,0x3F,0xA1,0xBF,0xFF01,0xFF1F):
+  assert cp in cmap,(path,hex(cp),'missing Inter punctuation coverage')
+ assert f['hmtx'].metrics[cmap[0xFF01]][0]==1000
+ assert f['hmtx'].metrics[cmap[0xFF1F]][0]==1000
  interrobang='Interrobang' in path.name
  if 'fvar' in f:
   if interrobang:
@@ -74,6 +78,7 @@ def audit(path):
   mapping=singlemap(f,script,WESTERN_LANGUAGE_SYSTEMS[script][0],'locl')
   assert set(mapping)==expected_sources,(script,len(mapping),len(expected_sources))
   for cp in HANKEN_SHARED_PUNCTUATION:
+   if cp in (0x21,0x3F,0xA1,0xBF): continue
    source=cmap[cp]; alt=mapping.get(source)
    assert alt and alt!=source,(script,hex(cp),source,alt)
  comma=cmap[0x3001]
@@ -109,6 +114,7 @@ def audit_hanken_provenance(path,source_path):
  cmap=f.getBestCmap(); hcmap=h.getBestCmap()
  mapping=singlemap(f,'latn','ENG ','locl')
  for cp in HANKEN_SHARED_PUNCTUATION:
+  if cp in (0x21,0x3F,0xA1,0xBF): continue
   assert glyph_signature(f,mapping[cmap[cp]])==glyph_signature(h,hcmap[cp]),hex(cp)
  f.close();h.close()
 

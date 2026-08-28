@@ -15,9 +15,7 @@ from fontTools.designspaceLib import (
     AxisDescriptor, DesignSpaceDocument, InstanceDescriptor, SourceDescriptor,
 )
 from fontTools.misc.roundTools import otRound
-from fontTools.otlLib.builder import (
-    buildLigatureSubstSubtable, buildLookup, buildStatTable,
-)
+from fontTools.otlLib.builder import buildStatTable
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables import ttProgram
 from fontTools.ttLib.tables._g_l_y_f import Glyph, GlyphCoordinates
@@ -27,6 +25,10 @@ from fontTools.varLib.instancer import instantiateVariableFont
 
 from font_metadata import (
     COPYRIGHT, DESIGNER, TRADEMARK, apply_binary_metadata, project_names,
+)
+from inter_punctuation import (
+    add_pair_substitutions, import_interrobang as import_pair_interrobang,
+    replace_public_punctuation,
 )
 
 REPO = Path(__file__).resolve().parents[1]
@@ -253,7 +255,7 @@ def locl_variants(font, glyph_name):
     return variants
 
 
-def add_ligatures(font):
+def add_ligatures_legacy(font):
     cmap = font.getBestCmap()
     question_variants = locl_variants(font, cmap[0x003F])
     exclam_variants = locl_variants(font, cmap[0x0021])
@@ -310,6 +312,24 @@ def add_ligatures(font):
                 language_system.ReqFeatureIndex = remap[language_system.ReqFeatureIndex]
 
 
+def set_full_width_ligature_caret_legacy(font):
+    """Put the two-component full-width ligature caret at the em boundary."""
+    if "GDEF" not in font:
+        font["GDEF"] = newTable("GDEF")
+        font["GDEF"].table = otTables.GDEF()
+        font["GDEF"].table.Version = 0x00010000
+        font["GDEF"].table.GlyphClassDef = None
+        font["GDEF"].table.AttachList = None
+        font["GDEF"].table.MarkAttachClassDef = None
+        font["GDEF"].table.MarkGlyphSetsDef = None
+    table = font["GDEF"].table
+    table.LigCaretList = buildLigCaretList(
+        {"interrobang.full": [font["head"].unitsPerEm]},
+        {},
+        font.getReverseGlyphMap(),
+    )
+
+
 def glyph_signature(font, glyph_name):
     glyph = font["glyf"][glyph_name]
     coords, end_points, flags = glyph.getCoordinates(font["glyf"])
@@ -319,7 +339,7 @@ def glyph_signature(font, glyph_name):
     )
 
 
-def interrobang_targets(font):
+def interrobang_targets_legacy(font):
     cmap = font.getBestCmap()
     pairs = ((cmap[0x003F], cmap[0x0021]), (cmap[0xFF1F], cmap[0xFF01]))
     targets = []
@@ -355,12 +375,13 @@ def build_static_masters():
             variable, {"wght": weight}, inplace=False, optimize=True, static=True
         )
         variable.close()
-        import_interrobang(font, weight)
+        replace_public_punctuation(font, INTER_VF, weight)
+        half_name, full_name, zero_name = import_pair_interrobang(font, INTER_VF, weight)
         glyph_order = list(font["glyf"].glyphs)
         font.setGlyphOrder(glyph_order)
         font["glyf"].glyphOrder = glyph_order
         map_literal_interrobang(font)
-        add_ligatures(font)
+        add_pair_substitutions(font, half_name, full_name, zero_name)
         set_static_names(font, weight, style)
         try:
             buildStatTable(font, [dict(
@@ -456,7 +477,8 @@ def validate_output(output, paths):
     signatures = []
     for weight in WEIGHTS:
         static = TTFont(paths[weight])
-        half_static, full_static = interrobang_targets(static)
+        half_static = static.getBestCmap()[0x203D]
+        full_static = static.getGlyphOrder()[-2]
         assert static.getBestCmap().get(0x203D) == half_static, (
             weight, "literal U+203D does not map to half-width interrobang"
         )
@@ -465,7 +487,8 @@ def validate_output(output, paths):
             instance = instantiateVariableFont(
                 variable, {"wght": weight}, inplace=False, optimize=True, static=True
             )
-            half_instance, full_instance = interrobang_targets(instance)
+            half_instance = instance.getBestCmap()[0x203D]
+            full_instance = instance.getGlyphOrder()[-2]
             assert instance.getBestCmap().get(0x203D) == half_instance, (
                 weight, "variable instance U+203D cmap mismatch"
             )

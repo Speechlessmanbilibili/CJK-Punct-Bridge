@@ -4,7 +4,7 @@
 
 > This is a punctuation companion, not a standalone text typeface. It intentionally leaves letters, CJK ideographs, kana, Hangul, and ASCII digits to the fonts that follow it in the stack.
 
-**v1.3.3 is the current release.** It adds direct `U+203D` mapping to the
+**v1.3.4 is the current release.** It standardizes question/exclamation forms on Inter and retains direct `U+203D` mapping in the
 optional CJK `?!` family, the independent Interrobang Bridge attachment, and
 WOFF2 output for every static and variable face.
 
@@ -17,6 +17,7 @@ CJK Punct Bridge solves that problem with OpenType language systems and `locl` s
 - CJK language tags select punctuation from the corresponding Google Fonts Noto Sans regional source.
 - Explicit Western language tags select Hanken Grotesk forms for all 46 punctuation characters shared with Hanken.
 - A missing or unspecified language intentionally falls back to Simplified Chinese punctuation.
+- Across all paths, `!`, `?`, `¡`, `¿`, `！`, and `？` use matching Inter 4.001 outlines; the full-width pair retains 1000-unit advances.
 
 ## Quick start
 
@@ -127,13 +128,20 @@ Each master uses Inter 4.001's U+203D outline instantiated at the matching
 The standard bridge remains unchanged at `U+203D`; this direct mapping belongs
 only to the optional `?!` family.
 
+Pair shaping keeps two source-character slots but gives them explicit advances:
+`?!`/`!?` become a visible half-width Inter interrobang plus a zero-width empty
+glyph (`500 + 0`), while `？！`/`！？` use the full-width form plus the same empty
+glyph (`1000 + 0`). The middle caret therefore coincides with the visible right
+edge without relying on GDEF support. Direct `U+203D` input remains the true
+single-character path.
+
 This variant is an attachment, not the main product: the standard family
 described above remains the default distribution and the primary subject of
 this documentation. The variant ships as its own family
 (`CJKPunctBridgeInterrobang-*`) with upright and italic variable fonts plus
 nine static weights each, so it can be installed or removed independently.
 All static and variable faces are also supplied as WOFF2 files.
-The release attachment is named `CJKPunctBridgeInterrobang-v1.3.3.zip`.
+The release attachment is named `CJKPunctBridgeInterrobang-v1.3.4.zip`.
 Build it from the standard statics with:
 
 ```bash
@@ -148,18 +156,17 @@ above 64 MiB.
 
 ## Interrobang Bridge attachment
 
-The release also includes **Interrobang Bridge**, a minimal Western companion
-font built only from Inter. Its cmap contains exactly `U+0021` (`!`), `U+003F`
-(`?`), and `U+203D` (`‽`). Default `liga` maps `?!` and `!?` to the same encoded
-interrobang glyph, while every other character falls through to the next font
-in the stack. Place it before the normal Western font when only this behavior
-is wanted, without the CJK punctuation coverage of CJK Punct Bridge.
+The release also includes **Interrobang Bridge**, a compact companion built only
+from Inter. Its cmap covers `!`, `?`, `¡`, `¿`, `！`, `？`, and `U+203D ‽`.
+Default `liga` shapes ASCII pairs as `500 + 0` and full-width pairs as `1000 + 0`;
+all other characters fall through to the next font in the stack. Place it before
+the normal font when only this punctuation behavior is wanted.
 
 The attachment provides nine static upright weights, nine static italics, and
 separate upright/italic `wght` variable fonts. Every master is instantiated
 from the matching Inter 4.001 weight, and direct `U+203D` input is supported.
 All twenty TTF faces have matching WOFF2 files.
-The release attachment is named `InterrobangBridge-v1.3.3.zip`.
+The release attachment is named `InterrobangBridge-v1.3.4.zip`.
 
 ```bash
 python scripts/build_interrobang_bridge.py

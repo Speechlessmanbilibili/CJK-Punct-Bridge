@@ -73,6 +73,11 @@ The optional family maps literal `U+203D` directly to the same half-width
 weight-matched glyph used by the `?!`/`!?` ligatures. The standard bridge does
 not gain this mapping.
 
+Pair shaping uses two contextual substitutions rather than a standard ligature:
+the first source glyph becomes the visible interrobang and the second becomes
+a zero-width empty glyph. ASCII pairs therefore shape to `500 + 0`; full-width
+pairs shape to `1000 + 0`, so the middle caret coincides with the right edge.
+
 ## 5. Minimal Western Interrobang Bridge
 
 Build the independent Inter-only companion after the pinned Inter files are in
@@ -84,9 +89,9 @@ INTERROBANG_BRIDGE_ITALIC=1 python scripts/build_interrobang_bridge.py
 ```
 
 It emits nine static weights and one variable font per posture under
-`fonts-interrobang-bridge/`, plus matching WOFF2 files. Validation requires the cmap to contain exactly
-`!`, `?`, and `U+203D`, both `?!` and `!?` to target the encoded interrobang,
-and all nine Inter weight outlines to remain distinct.
+`fonts-interrobang-bridge/`, plus matching WOFF2 files. The cmap contains
+`!`, `?`, `¡`, `¿`, `！`, `？`, and `U+203D`; pair shaping uses `500 + 0` or
+`1000 + 0`, and all nine Inter weight outlines must remain distinct.
 
 ## Merge strategy
 
