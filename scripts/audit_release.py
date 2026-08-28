@@ -8,6 +8,7 @@ from language_systems import (
  WESTERN_SCRIPT_TAGS,
 )
 from font_metadata import audit_metadata
+from build_interrobang import INTER_LEGAL
 
 REGIONS=tuple(tag for aliases in CJK_LANGUAGE_ALIASES.values() for tag in aliases)
 
@@ -40,11 +41,19 @@ def singlemap(font,script,lang,feature):
 
 def audit(path):
  f=TTFont(path); cmap=f.getBestCmap()
+ interrobang='Interrobang' in path.name
  if 'fvar' in f:
-  unique_id='CJKPunctBridge-Italic-VF' if 'Italic' in path.name else 'CJKPunctBridge-VF'
+  if interrobang:
+   unique_id='CJKPunctBridgeInterrobang-Italic-VF' if 'Italic' in path.name else 'CJKPunctBridgeInterrobang-VF'
+  else:
+   unique_id='CJKPunctBridge-Italic-VF' if 'Italic' in path.name else 'CJKPunctBridge-VF'
  else:
   unique_id=path.stem
- audit_metadata(f,unique_id)
+ audit_metadata(f,unique_id,INTER_LEGAL if interrobang else None)
+ if interrobang:
+  assert 0x203D in cmap and cmap[0x203D] in f.getGlyphOrder(),(path,'literal U+203D cmap missing or incorrect')
+ else:
+  assert 0x203D not in cmap,(path,'standard family must not gain the optional U+203D mapping')
  assert len(cmap)>=180
  assert not set(range(0x30,0x3A)) & set(cmap),(path,'ASCII digits must be supplied by Hanken, not the bridge')
  assert {'ccmp','dlig','locl','vert','vrt2'} <= tags(f,'DFLT',None)
@@ -52,8 +61,9 @@ def audit(path):
   assert {'ccmp','dlig','locl','vert','vrt2'} <= tags(f,'DFLT',lang), lang
  for script in WESTERN_SCRIPT_TAGS:
   assert {'ccmp','dlig','locl','vert','vrt2'} <= tags(f,script,None),script
-  for lang in WESTERN_LANGUAGE_SYSTEMS[script]:
-   assert tags(f,script,lang)=={'locl'},(script,lang,tags(f,script,lang))
+ for lang in WESTERN_LANGUAGE_SYSTEMS[script]:
+   expected={'locl','liga'} if interrobang else {'locl'}
+   assert tags(f,script,lang)==expected,(script,lang,tags(f,script,lang))
  quote=cmap[0x201C]
  for lang in ('ZHT ','ZHH ','ZHTM','JAN ','KOR ','KOH '):
   alt=singlemap(f,'DFLT',lang,'locl').get(quote)

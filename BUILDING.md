@@ -20,7 +20,9 @@ python scripts/audit_release.py fonts/static/CJKPunctBridge-Regular.ttf fonts/va
 python scripts/check_dash_matrix.py fonts/static/CJKPunctBridge-Regular.ttf fonts/variable/CJKPunctBridge-Variable.ttf
 ```
 
-Outputs are written under `fonts/static/`, `fonts/variable/`, and `fonts/web/`; release binaries remain outside normal Git history.
+Outputs are written under `fonts/static/`, `fonts/variable/`, and `fonts/web/`;
+`fonts/web/` contains WOFF2 versions of every static and variable face. Release
+binaries remain outside normal Git history.
 
 ## 3. Italic family
 
@@ -61,10 +63,30 @@ CJK_PUNCT_ITALIC=1 INTER_VF=upstream/InterVariable-Italic.ttf python scripts/bui
 ```
 
 Each pass builds nine static faces and one variable font under
-`fonts-interrobang/`. Inter U+203D is instantiated at the matching weight for
+`fonts-interrobang/`, with matching WOFF2 files under its `web/` directory.
+Inter U+203D is instantiated at the matching weight for
 every master. Validation requires nine distinct outlines, matching
 variable/static endpoints, fewer than 60,000 glyphs, and a `gvar` table below
 64 MiB.
+
+The optional family maps literal `U+203D` directly to the same half-width
+weight-matched glyph used by the `?!`/`!?` ligatures. The standard bridge does
+not gain this mapping.
+
+## 5. Minimal Western Interrobang Bridge
+
+Build the independent Inter-only companion after the pinned Inter files are in
+`upstream/`:
+
+```bash
+python scripts/build_interrobang_bridge.py
+INTERROBANG_BRIDGE_ITALIC=1 python scripts/build_interrobang_bridge.py
+```
+
+It emits nine static weights and one variable font per posture under
+`fonts-interrobang-bridge/`, plus matching WOFF2 files. Validation requires the cmap to contain exactly
+`!`, `?`, and `U+203D`, both `?!` and `!?` to target the encoded interrobang,
+and all nine Inter weight outlines to remain distinct.
 
 ## Merge strategy
 

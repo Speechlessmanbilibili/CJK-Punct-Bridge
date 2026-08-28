@@ -41,8 +41,9 @@ INTER_DEFAULT = REPO / "upstream" / (
 INTER_VF = Path(os.environ.get("INTER_VF", INTER_DEFAULT))
 STATIC_OUT = REPO / "fonts-interrobang" / "static"
 VARIABLE_OUT = REPO / "fonts-interrobang" / "variable"
+WEB_OUT = REPO / "fonts-interrobang" / "web"
 WORK = REPO / "build" / "interrobang"
-for directory in (STATIC_OUT, VARIABLE_OUT, WORK):
+for directory in (STATIC_OUT, VARIABLE_OUT, WEB_OUT, WORK):
     directory.mkdir(parents=True, exist_ok=True)
 
 FAMILY = "CJK Punct Bridge ?!"
@@ -211,6 +212,19 @@ def import_interrobang(font, weight):
     source.close()
 
 
+def map_literal_interrobang(font):
+    """Map literal U+203D to the same half-width glyph used by ?!/!? liga."""
+    unicode_tables = [table for table in font["cmap"].tables if table.isUnicode()]
+    if not unicode_tables:
+        raise AssertionError("font has no Unicode cmap subtable")
+    for table in unicode_tables:
+        existing = table.cmap.get(0x203D)
+        if existing not in (None, "interrobang.uni203D"):
+            raise AssertionError((hex(0x203D), "unexpected existing cmap target", existing))
+        table.cmap[0x203D] = "interrobang.uni203D"
+    assert font.getBestCmap()[0x203D] == "interrobang.uni203D"
+
+
 def locl_variants(font, glyph_name):
     table = font["GSUB"].table
     variants = {glyph_name}
@@ -345,6 +359,7 @@ def build_static_masters():
         glyph_order = list(font["glyf"].glyphs)
         font.setGlyphOrder(glyph_order)
         font["glyf"].glyphOrder = glyph_order
+        map_literal_interrobang(font)
         add_ligatures(font)
         set_static_names(font, weight, style)
         try:
@@ -356,6 +371,9 @@ def build_static_masters():
             print("STAT warning", error, flush=True)
         output = static_path(weight, style)
         font.save(output, reorderTables=True)
+        web_output = WEB_OUT / output.with_suffix(".woff2").name
+        font.flavor = "woff2"
+        font.save(web_output, reorderTables=True)
         font.close()
         paths[weight] = output
         print(f"saved {output.name} {output.stat().st_size / 1048576:.2f} MiB", flush=True)
@@ -419,6 +437,9 @@ def build_variable(paths):
     buildStatTable(variable, stat_axes)
     output = VARIABLE_OUT / f"{PS}{'-Italic' if ITALIC else ''}-Variable.ttf"
     variable.save(output, reorderTables=True)
+    web_output = WEB_OUT / output.with_suffix(".woff2").name
+    variable.flavor = "woff2"
+    variable.save(web_output, reorderTables=True)
     variable.close()
     return output
 
@@ -436,12 +457,18 @@ def validate_output(output, paths):
     for weight in WEIGHTS:
         static = TTFont(paths[weight])
         half_static, full_static = interrobang_targets(static)
+        assert static.getBestCmap().get(0x203D) == half_static, (
+            weight, "literal U+203D does not map to half-width interrobang"
+        )
         signatures.append(glyph_signature(static, half_static))
         if weight in (100, 400, 900):
             instance = instantiateVariableFont(
                 variable, {"wght": weight}, inplace=False, optimize=True, static=True
             )
             half_instance, full_instance = interrobang_targets(instance)
+            assert instance.getBestCmap().get(0x203D) == half_instance, (
+                weight, "variable instance U+203D cmap mismatch"
+            )
             for variable_name, static_name in (
                 (half_instance, half_static), (full_instance, full_static),
             ):

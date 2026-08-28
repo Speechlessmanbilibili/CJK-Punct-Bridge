@@ -21,8 +21,10 @@ from build_interrobang import INTER_LEGAL
 REPO = Path(__file__).resolve().parents[1]
 STATIC = REPO / "fonts-interrobang" / "static"
 OUT = REPO / "fonts-interrobang" / "variable"
+WEB_OUT = REPO / "fonts-interrobang" / "web"
 WORK = REPO / "build" / "interrobang-vf"
 OUT.mkdir(parents=True, exist_ok=True)
+WEB_OUT.mkdir(parents=True, exist_ok=True)
 WORK.mkdir(parents=True, exist_ok=True)
 
 FAMILY = "CJK Punct Bridge ?!"
@@ -76,6 +78,27 @@ def style_names():
         ("Italic" if (ITALIC and weight == 400) else style + (" Italic" if ITALIC else ""))
         for weight, style in WEIGHTS.items()
     ]
+
+
+def validate_literal_mapping(output, paths):
+    variable = TTFont(output)
+    signatures = []
+    for weight, path in paths.items():
+        static = TTFont(path)
+        static_glyph = static.getBestCmap().get(0x203D)
+        assert static_glyph == "interrobang.uni203D", (weight, "static U+203D cmap mismatch")
+        signatures.append(static["hmtx"].metrics[static_glyph])
+        if weight in (100, 400, 900):
+            instance = instantiateVariableFont(
+                variable, {"wght": weight}, inplace=False, optimize=True, static=True
+            )
+            assert instance.getBestCmap().get(0x203D) == static_glyph, (
+                weight, "variable instance U+203D cmap mismatch"
+            )
+            instance.close()
+        static.close()
+    assert len(set(signatures)) > 1, "U+203D metrics do not vary across weights"
+    variable.close()
 
 
 def main():
@@ -152,8 +175,11 @@ def main():
 
     output = OUT / f"{PS}{'-Italic' if ITALIC else ''}-Variable.ttf"
     variable.save(output, reorderTables=True)
+    variable.flavor = "woff2"
+    variable.save(WEB_OUT / output.with_suffix(".woff2").name, reorderTables=True)
     variable.close()
     print("saved", output, output.stat().st_size / 1048576, "MiB", flush=True)
+    validate_literal_mapping(output, paths)
 
 
 if __name__ == "__main__":

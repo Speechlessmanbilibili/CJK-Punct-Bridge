@@ -1,5 +1,13 @@
 # FONTLOG
 
+## 1.330 / v1.3.3 — 2026-08-28
+
+- Added a literal `U+203D` cmap entry to every optional **CJK Punct Bridge ?!** static and variable font, pointing to the same half-width, weight-matched Inter outline used by the `?!` and `!?` ligatures.
+- Kept the standard bridge family unchanged at `U+203D`; the direct-character mapping remains exclusive to the optional `?!` attachment.
+- Advanced all standard and optional release fonts to internal version 1.330 and extended static/variable validation to enforce the cmap boundary.
+- Added **Interrobang Bridge**, an independent Inter-only Western companion attachment with cmap entries for `!`, `?`, and `U+203D`; `?!` and `!?` ligate to the encoded interrobang across nine upright and italic static weights plus two variable fonts.
+- Added WOFF2 output for every static and variable face in the standard bridge, CJK Punct Bridge ?!, and Interrobang Bridge families.
+
 ## 1.320 — 2026-08-27
 
 - Corrected upright/italic family metadata in both the standard and optional `?!` builds: italic faces now set `ITALIC` and clear `REGULAR`, while Bold Italic sets only `ITALIC + BOLD`.

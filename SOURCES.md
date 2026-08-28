@@ -1,6 +1,6 @@
 # Source inputs
 
-Pinned upstream binaries used by v1.3.2. Build-time source files live in the gitignored `upstream/` directory. Noto Sans and Hanken Grotesk are sourced exclusively from the Google Fonts repository distributions shown below.
+Pinned upstream binaries used by v1.3.3. Build-time source files live in the gitignored `upstream/` directory. Noto Sans and Hanken Grotesk are sourced exclusively from the Google Fonts repository distributions shown below.
 
 | Input | Pinned source | SHA-256 |
 | --- | --- | --- |

@@ -4,6 +4,10 @@
 
 > This is a punctuation companion, not a standalone text typeface. It intentionally leaves letters, CJK ideographs, kana, Hangul, and ASCII digits to the fonts that follow it in the stack.
 
+**v1.3.3 is the current release.** It adds direct `U+203D` mapping to the
+optional CJK `?!` family, the independent Interrobang Bridge attachment, and
+WOFF2 output for every static and variable face.
+
 ## Why use a bridge font?
 
 Many punctuation characters share the same Unicode code points across languages even though their preferred shapes, widths, and placement differ. A normal fallback stack cannot choose a different font for the same code point based on language alone.
@@ -20,12 +24,13 @@ Download the latest files from [GitHub Releases](https://github.com/Speechlessma
 
 - `CJKPunctBridge-Variable.woff2` for the web, with a `wght` axis from 100 to 900;
 - `CJKPunctBridge-Variable.ttf` for desktop use;
-- nine static TTF weights from Thin 100 through Black 900.
+- nine static TTF and WOFF2 weights from Thin 100 through Black 900.
 
 An italic family ships alongside, as a separate `wght`-only variable font plus
 nine static italics — the same layout as the pinned Hanken Grotesk release:
 `CJKPunctBridge-Italic-Variable.woff2` / `.ttf`, and `CJKPunctBridge-Italic.ttf`,
-`CJKPunctBridge-ThinItalic.ttf`, …, `CJKPunctBridge-BlackItalic.ttf`.
+`CJKPunctBridge-ThinItalic.ttf`, …, `CJKPunctBridge-BlackItalic.ttf`, with a
+matching WOFF2 for every static face.
 
 In italics, Western punctuation uses the true Hanken Grotesk Italic designs;
 CJK punctuation uses a uniform synthetic 10-degree slant (no true CJK italic
@@ -115,16 +120,20 @@ Releases also carry an optional companion family, **CJK Punct Bridge ?!**, that
 ligates question/exclamation pairs into the interrobang: `?!` and `!?` become
 `‽` (U+203D), while full-width `？！` and `！？` become a full-width interrobang,
 aligned left like other full-width CJK punctuation. The ligatures are on by
-default (`liga`) and cover every regional `locl` variant of `?` and `!`. Each
-master uses Inter 4.001's U+203D outline instantiated at the matching `wght`,
-so Thin through Black have genuinely different interrobang outlines.
+default (`liga`) and cover every regional `locl` variant of `?` and `!`.
+Literal `U+203D` (`‽`) is also mapped directly to the same half-width glyph.
+Each master uses Inter 4.001's U+203D outline instantiated at the matching
+`wght`, so Thin through Black have genuinely different interrobang outlines.
+The standard bridge remains unchanged at `U+203D`; this direct mapping belongs
+only to the optional `?!` family.
 
 This variant is an attachment, not the main product: the standard family
 described above remains the default distribution and the primary subject of
 this documentation. The variant ships as its own family
 (`CJKPunctBridgeInterrobang-*`) with upright and italic variable fonts plus
 nine static weights each, so it can be installed or removed independently.
-The release attachment is named `CJKPunctBridgeInterrobang-v1.3.2.zip`.
+All static and variable faces are also supplied as WOFF2 files.
+The release attachment is named `CJKPunctBridgeInterrobang-v1.3.3.zip`.
 Build it from the standard statics with:
 
 ```bash
@@ -136,6 +145,26 @@ The interrobang glyph source is a hash-pinned Inter variable font passed via
 `INTER_VF` or placed in `upstream/`. The build rejects repeated weight outlines,
 variable/static endpoint drift, 60,000 or more glyphs, and a `gvar` table at or
 above 64 MiB.
+
+## Interrobang Bridge attachment
+
+The release also includes **Interrobang Bridge**, a minimal Western companion
+font built only from Inter. Its cmap contains exactly `U+0021` (`!`), `U+003F`
+(`?`), and `U+203D` (`‽`). Default `liga` maps `?!` and `!?` to the same encoded
+interrobang glyph, while every other character falls through to the next font
+in the stack. Place it before the normal Western font when only this behavior
+is wanted, without the CJK punctuation coverage of CJK Punct Bridge.
+
+The attachment provides nine static upright weights, nine static italics, and
+separate upright/italic `wght` variable fonts. Every master is instantiated
+from the matching Inter 4.001 weight, and direct `U+203D` input is supported.
+All twenty TTF faces have matching WOFF2 files.
+The release attachment is named `InterrobangBridge-v1.3.3.zip`.
+
+```bash
+python scripts/build_interrobang_bridge.py
+INTERROBANG_BRIDGE_ITALIC=1 python scripts/build_interrobang_bridge.py
+```
 
 ## License
 

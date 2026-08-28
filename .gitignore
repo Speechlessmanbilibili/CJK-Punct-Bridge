@@ -5,6 +5,7 @@ fonts/static/
 fonts/variable/
 fonts/web/
 fonts-interrobang/
+fonts-interrobang-bridge/
 __pycache__/
 *.pyc
 .DS_Store

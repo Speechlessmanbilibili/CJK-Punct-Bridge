@@ -482,7 +482,9 @@ def main():
     for w,s in ALL_WEIGHTS.items():
         f=TTFont(vfp); st=instantiateVariableFont(f,{"wght":w},inplace=False,optimize=True,static=True)
         set_static_names(st,w,s); op=OUT/"fonts"/"static"/f"{PS}-{s}.ttf"
-        st.save(op,reorderTables=True); st.close(); f.close()
+        st.save(op,reorderTables=True)
+        st.flavor="woff2"; st.save(OUT/"fonts"/"web"/f"{PS}-{s}.woff2",reorderTables=True)
+        st.close(); f.close()
     f=TTFont(vfp); f.flavor="woff2"; f.save(OUT/"fonts"/"web"/f"{PS}-Variable.woff2"); f.close()
     print("DONE upright",vfp,flush=True)
 
@@ -496,7 +498,10 @@ def main():
             f=TTFont(vfp); st=instantiateVariableFont(f,{"wght":w},inplace=False,optimize=True,static=True)
             set_static_names(st,w,s,italic=True)
             op=OUT/"fonts"/"static"/f"{PS}-{'Italic' if w==400 else s+'Italic'}.ttf"
-            st.save(op,reorderTables=True); st.close(); f.close()
+            st.save(op,reorderTables=True)
+            web_name=f"{PS}-{'Italic' if w==400 else s+'Italic'}.woff2"
+            st.flavor="woff2"; st.save(OUT/"fonts"/"web"/web_name,reorderTables=True)
+            st.close(); f.close()
         f=TTFont(vfp); f.flavor="woff2"; f.save(OUT/"fonts"/"web"/f"{PS}-Italic-Variable.woff2"); f.close()
         print("DONE italic",vfp,flush=True)
 
