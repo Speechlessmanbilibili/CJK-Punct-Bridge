@@ -1,67 +1,67 @@
-# FONTLOG
+# 发布日志
 
 ## 1.350 / v1.3.5 — 2026-11-22
 
-- Included the upright build fix (`cf6376f`) ensuring upright builds always source Inter punctuation from `InterVariable.ttf`.
-- Advanced internal font revision to 1.350 and rebuilt all static, variable, and WOFF2 outputs for the standard bridge, `CJK Punct Bridge ?!`, and `Interrobang Bridge`.
+- 包含正体构建修正（`cf6376f`），确保正体构建始终从 `InterVariable.ttf` 取用 Inter 标点轮廓。
+- 将内部字体版本号推进至 `1.350`（`fontRevision = 1.35`），重新编译并校验标准版、`CJK Punct Bridge ?!` 与 `Interrobang Bridge` 的全部静态、可变及 `WOFF2` 文件。
 
 ## 1.340 / v1.3.4 — 2026-08-28
 
-- Replaced `!`, `?`, `¡`, and `¿` with matching Inter 4.001 outlines in the standard and optional families.
-- Replaced full-width `！` and `？` with the same Inter outlines on a 1000-unit advance.
-- Changed optional pair shaping to explicit 500+0 glyph slots for `?!`/`!?` and 1000+0 slots for `？！`/`！？`.
+- 在标准版与可选家族中将 `!`、`?`、`¡` 与 `¿` 替换为字重匹配的 Inter 4.001 轮廓。
+- 将全角 `！` 与 `？` 替换为 1000 单位字宽的同一套 Inter 轮廓。
+- 将可选双字符组合排版改为显式的双槽位机制：`?!` / `!?` 为 `500 + 0`，`？！` / `！？` 为 `1000 + 0`。
 
 ## 1.330 / v1.3.3 — 2026-08-28
 
-- Added a literal `U+203D` cmap entry to every optional **CJK Punct Bridge ?!** static and variable font, pointing to the same half-width, weight-matched Inter outline used by the `?!` and `!?` ligatures.
-- Kept the standard bridge family unchanged at `U+203D`; the direct-character mapping remains exclusive to the optional `?!` attachment.
-- Advanced all standard and optional release fonts to internal version 1.330 and extended static/variable validation to enforce the cmap boundary.
-- Added **Interrobang Bridge**, an independent Inter-only companion attachment, initially with cmap entries for `!`, `?`, and `U+203D`; v1.3.4 expands it to inverted and full-width forms and replaces standard ligatures with two-slot shaping.
-- Added WOFF2 output for every static and variable face in the standard bridge, CJK Punct Bridge ?!, and Interrobang Bridge families.
+- 为可选的 **CJK Punct Bridge ?!** 全部静态与可变字体添加直接映射的 `U+203D` `cmap` 表项，指向与 `?!` / `!?` 连字相同的、按字重匹配的半角 Inter 轮廓。
+- 标准桥接家族在 `U+203D` 保持不变；直接字符映射仍为可选 `?!` 附件独占。
+- 将全部标准版与可选发行字体的内部版本推进至 `1.330`，并扩展静态 / 可变校验以强制约束 `cmap` 边界。
+- 新增 **Interrobang Bridge**，一个仅包含 Inter 的独立配套附件，初期 `cmap` 包含 `!`、`?` 与 `U+203D`；`v1.3.4` 将其扩展至倒置与全角形态并改用双槽位排版。
+- 为标准桥接、`CJK Punct Bridge ?!` 与 `Interrobang Bridge` 家族的全部静态与可变字体添加 `WOFF2` 输出。
 
 ## 1.320 — 2026-08-27
 
-- Corrected upright/italic family metadata in both the standard and optional `?!` builds: italic faces now set `ITALIC` and clear `REGULAR`, while Bold Italic sets only `ITALIC + BOLD`.
-- Corrected legacy subfamily names separately from typographic subfamily names so Office/GDI links Regular, Bold, Italic, and Bold Italic without losing the full weight name.
-- Rebuilt the optional `?!` family from weight-matched Inter 4.001 instances instead of reusing the default 400 `U+203D` outline for every master.
-- Added nine-weight outline, variable/static endpoint, glyph-count, and 64 MiB `gvar` validation for the optional variable fonts.
+- 修正标准版与可选 `?!` 构建的正斜体家族元数据：斜体字面现已设置 `ITALIC` 并清除 `REGULAR`，Bold Italic 仅设置 `ITALIC + BOLD`。
+- 区分修正传统子族名称与排版子族名称，使 Office / GDI 在不丢失完整字重名称的前提下正确关联 Regular、Bold、Italic 与 Bold Italic。
+- 改为从字重匹配的 Inter 4.001 实例构建可选 `?!` 家族，不再对所有主控字重复用默认 400 字重的 `U+203D` 轮廓。
+- 为可选可变字体新增 9 个字重轮廓、可变 / 静态端点、字形数量与 64 MiB `gvar` 体积校验。
 
 ## 1.310 — 2026-08-26
 
-- Added an optional companion family, **CJK Punct Bridge ?!**, shipped as a release attachment: `?!`/`!?` ligate to U+203D and full-width `？！`/`！？` ligate to a full-width left-aligned interrobang, enabled by default via `liga` across all regional `locl` variants.
-- Sourced the interrobang outline from Inter's U+203D design (half-width extracted, full-width reusing the same contour with a 1000-unit advance); the variant is a separate family (`CJKPunctBridgeInterrobang-*`) with upright and italic variable fonts plus nine static weights each.
-- The standard family remains the default distribution; the interrobang build is documented as an optional attachment.
+- 新增可选配套家族 **CJK Punct Bridge ?!** 作为发行附件分发：`?!` / `!?` 连字为 `U+203D`，全角 `？！` / `！？` 连字为左对齐的全角疑问叹号，并在全部地区 `locl` 变体中通过 `liga` 默认启用。
+- 疑问叹号轮廓取自 Inter 的 `U+203D` 设计（直接提取半角形态，全角形态复用同一轮廓并设为 1000 单位字宽）；该变体以独立家族（`CJKPunctBridgeInterrobang-*`）分发，包含正斜体可变字体与各 9 个静态字重。
+- 标准家族仍为默认分发版本；疑问叹号构建版作为可选附件记录。
 
 ## 1.300 — 2026-08-24
 
-- Added a full italic family alongside the upright family, published as a separate single-axis variable font (`CJKPunctBridge-Italic-Variable.ttf`) plus nine static italics, exactly mirroring the pinned Hanken Grotesk release layout.
-- Latin/Western punctuation in italics uses the true Hanken Grotesk Italic designs from the pinned Google Fonts distribution; CJK regional punctuation and Zhudou dashes use a uniform synthetic 10-degree shear because no true CJK italic design exists.
-- The synthetic shear preserves simple-glyph point structure, flags, and end points so varLib masters stay interpolatable; composites are decomposed identically on every master; left side bearings are recomputed from the new bounds.
-- Dropped the Noto-derived `BASE` ItemVariationStore from the variable build (Hanlink merge policy) so the layout tables compile cleanly against HVAR.
-- Extended release audits to verify italic style bits, `italicAngle`, subfamily naming, and exact Hanken Italic provenance for the Western punctuation.
+- 在正体家族之外新增完整的斜体家族，以独立的单轴可变字体（`CJKPunctBridge-Italic-Variable.ttf`）与 9 个静态斜体发布，完全对齐锁定的 Hanken Grotesk 发行布局。
+- 斜体中的西文标点采用锁定 Google Fonts 分发版中真正的 Hanken Grotesk Italic 设计；由于不存在真正的中日韩斜体标点设计，中日韩地区标点与煮豆破折号统一施加 10 度人工倾斜。
+- 人工倾斜保留简单字形的轮廓点结构、标志位与端点，使 `varLib` 主控字重保持可插值；复合字形在所有主控字重中以相同方式打散；依据新边界重新计算左侧轴距。
+- 参照 Hanlink 合并策略，在可变构建中移除源自 Noto 的 `BASE` `ItemVariationStore`，使布局表可针对 `HVAR` 干净编译。
+- 扩展发行校验，验证斜体样式位、`italicAngle`、子族命名以及西文标点的精确 Hanken Italic 来源。
 
 ## 1.200 — 2026-08-24
 
-- Expanded Hanken `locl` coverage from eight ambiguous English marks to all 46 punctuation code points shared by the bridge and the pinned Google Fonts Hanken Grotesk distribution.
-- Made ASCII digits a hard bridge exclusion so `0`–`9` always fall through to Hanken Grotesk in every language.
-- Applied the Hanken punctuation path to the configured registered Western languages in Common, Latin, Cyrillic, and Greek runs, while keeping every default LangSys on Noto Sans SC.
-- Added explicit Noto regional aliases for Chinese Hong Kong/Macao/phonetic tags and Korean old Hangul.
-- Hardened release audits to check the complete Hanken punctuation mapping, every Western language system, all CJK regional aliases, and the no-ligation dash policy.
-- Split Noto SC's shared `U+00B7`/`U+2022` source glyph inside the bridge so both code points can select their distinct Hanken designs without changing CJK behavior.
-- Repaired the pinned Zhudou v2.000 release-asset URL after the upstream archive name changed.
-- Documented that every Noto Sans and Hanken Grotesk build input must come from a pinned Google Fonts repository commit.
-- Replaced inherited upstream identity fields with explicit project authorship, modification copyright, source attribution, repository links, OFL details, and a project-aligned internal revision in every static, variable, and web font.
+- 将 Hanken `locl` 覆盖范围从原本 8 个易歧义英文标点扩展至桥接字体与锁定 Google Fonts Hanken Grotesk 分发版共享的全部 46 个标点码位。
+- 硬性排除 ASCII 数字，确保 `0～9` 在任意语言下均回退至 Hanken Grotesk。
+- 将 Hanken 标点路径应用至 Common、Latin、Cyrillic 与 Greek 片段中已配置的注册西文语言，同时让所有默认 `LangSys` 保持为 Noto Sans SC。
+- 为中国香港 / 澳门、拼音 / 注音中文标签与韩文古谚文添加显式 Noto 地区别名。
+- 强化发行校验以检查完整的 Hanken 标点映射、每个西文语言系统、所有中日韩地区别名与非连字破折号策略。
+- 在桥接字体内部拆分 Noto SC 原先共享的 `U+00B7` / `U+2022` 源字形，使两个码位可在不影响中日韩行为的前提下分别选择各自不同的 Hanken 设计。
+- 在上游压缩包改名后修复了锁定的煮豆黑体 `v2.000` 发行资产下载链接。
+- 明确要求所有 Noto Sans 与 Hanken Grotesk 构建输入必须来自锁定的 Google Fonts 仓库提交。
+- 在全部静态、可变与 Web 字体中，将继承自上游的身份字段替换为明确的项目作者、修改版权、来源署名、仓库链接、OFL 说明与对齐项目的内部修订号。
 
 ## 1.100 — 2026-08-24
 
-- Expanded the bridge from SC/English to a single SC/TC/JP/KR/English language-aware punctuation font.
-- Made unspecified language/region explicitly follow the SC `ZHS` punctuation path.
-- Added `ZHT`, `JAN`, and `KOR` `locl` alternates from the actual Google Fonts Noto Sans TC/JP/KR distributions.
-- Added regional vertical punctuation targets while retaining Noto `ccmp`, `dlig`, width features, `vert`, and `vrt2` behavior.
-- Kept Zhudou-derived continuous Chinese dash outlines for SC and TC.
-- Kept Hanken Grotesk punctuation for `ENG`, with CJK continuous-dash `ccmp` disabled on the English path.
-- Switched build inputs to pinned Google Fonts variable TTFs with recorded SHA-256 hashes; builds can run fully offline after source prefetch.
+- 将桥接字体从简中 / 英文双语扩展为支持简中 / 繁中 / 日文 / 韩文 / 英文的单一语言感知标点字体。
+- 明确使未指定语言 / 地区的文本遵循简中 `ZHS` 标点路径。
+- 从实际的 Google Fonts Noto Sans TC / JP / KR 分发版添加 `ZHT`、`JAN` 与 `KOR` 的 `locl` 替换字形。
+- 添加地区竖排标点目标字形，同时保留 Noto 的 `ccmp`、`dlig`、字宽特性、`vert` 与 `vrt2` 行为。
+- 简繁中文继续保留源自煮豆黑体的连续破折号轮廓。
+- `ENG` 路径保留 Hanken Grotesk 标点，并在英文路径下禁用中日韩连续破折号 `ccmp`。
+- 将构建输入切换为附带记录 SHA-256 哈希的锁定 Google Fonts 可变 TTF；预取字源后可全程离线构建。
 
 ## 1.000 — 2026-08-23
 
-- Initial public release: Noto Sans SC punctuation base, Zhudou-derived Chinese dash outlines, and Hanken `ENG locl` punctuation.
+- 首次公开发布：Noto Sans SC 标点基础、源自煮豆黑体的中文破折号轮廓，以及 Hanken `ENG locl` 标点。
