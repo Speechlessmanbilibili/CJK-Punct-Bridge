@@ -6,6 +6,8 @@
 
 当前版本为 **`v1.3.5`**，所有发行包均可通过 [GitHub Releases](https://github.com/Speechlessmanbilibili/CJK-Punct-Bridge/releases/latest) 获取。
 
+![CJK Punct Bridge 破折号与多语言标点对照](docs/assets/cjk-punct-specimen.png)
+
 ## 三个发行家族怎么选？
 
 每次 Release 会同时提供 3 个独立家族，每套均包含 **正斜体单轴可变字体（`wght` `100～900`）**、**正斜体各 9 个静态字重（Thin 100 ～ Black 900）**，以及对应的 **`WOFF2` 网页格式**：
