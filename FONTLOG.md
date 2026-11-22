@@ -22,7 +22,7 @@
 ## 1.320 — 2026-08-27
 
 - 修正标准版与可选 `?!` 构建的正斜体家族元数据：斜体字面现已设置 `ITALIC` 并清除 `REGULAR`，Bold Italic 仅设置 `ITALIC + BOLD`。
-- 区分修正传统子族名称与排版子族名称，使 Office / GDI 在不丢失完整字重名称的前提下正确关联 Regular、Bold、Italic 与 Bold Italic。
+- 区分修正传统子族名称与排版子族名称，使 Office/GDI 在不丢失完整字重名称的前提下正确关联 Regular、Bold、Italic 与 Bold Italic。
 - 改为从字重匹配的 Inter 4.001 实例构建可选 `?!` 家族，不再对所有主控字重复用默认 400 字重的 `U+203D` 轮廓。
 - 为可选可变字体新增 9 个字重轮廓、可变 / 静态端点、字形数量与 64 MiB `gvar` 体积校验。
 
@@ -56,7 +56,7 @@
 
 - 将桥接字体从简中 / 英文双语扩展为支持简中 / 繁中 / 日文 / 韩文 / 英文的单一语言感知标点字体。
 - 明确使未指定语言 / 地区的文本遵循简中 `ZHS` 标点路径。
-- 从实际的 Google Fonts Noto Sans TC / JP / KR 分发版添加 `ZHT`、`JAN` 与 `KOR` 的 `locl` 替换字形。
+- 从实际的 Google Fonts Noto Sans TC/JP/KR 分发版添加 `ZHT`、`JAN` 与 `KOR` 的 `locl` 替换字形。
 - 添加地区竖排标点目标字形，同时保留 Noto 的 `ccmp`、`dlig`、字宽特性、`vert` 与 `vrt2` 行为。
 - 简繁中文继续保留源自煮豆黑体的连续破折号轮廓。
 - `ENG` 路径保留 Hanken Grotesk 标点，并在英文路径下禁用中日韩连续破折号 `ccmp`。

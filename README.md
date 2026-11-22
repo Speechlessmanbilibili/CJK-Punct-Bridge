@@ -24,7 +24,7 @@
 
 CJK Punct Bridge 利用 OpenType `locl` 语言系统特性化解这一问题：
 
-- **中日韩各自独立**：简中、繁中 / 港澳、日文、韩文分别取自 Google Fonts 官方 Noto Sans SC / TC / JP / KR。
+- **中日韩各自独立**：简中、繁中 / 港澳、日文、韩文分别取自 Google Fonts 官方 Noto Sans SC/TC/JP/KR。
 - **西文自动切换**：在显式西文语言标签下，与 Hanken Grotesk 共享的 46 个标点自动切换为 Hanken Grotesk 轮廓。
 - **问号与感叹号统一**：所有路径下的 `!`、`?`、`¡`、`¿`、`！`、`？` 均采用字重匹配的 Inter 4.001 轮廓，全角形式保留 1000 单位字宽。
 - **连续破折号**：简繁中文路径下的 `U+2014`（`—`）、`U+2E3A`（`⸺`）与 `U+2E3B`（`⸻`）采用源自煮豆黑体的破折号轮廓，连续输入保持不断开。
@@ -80,7 +80,7 @@ body {
 | 繁体中文、中国香港、中国澳门（`ZHT`、`ZHH`、`ZHTM`） | Google Fonts Noto Sans TC |
 | 日文（`JAN`） | Google Fonts Noto Sans JP |
 | 韩文、古谚文（`KOR`、`KOH`） | Google Fonts Noto Sans KR |
-| Common / Latin / Cyrillic / Greek 下的显式西文语言 | 覆盖范围内选用 Google Fonts Hanken Grotesk |
+| Common/Latin/Cyrillic/Greek 下的显式西文语言 | 覆盖范围内选用 Google Fonts Hanken Grotesk |
 
 已配置的西文路径覆盖项目常用地区、现代与历史西文语言集合，以及锁定 Hanken 字源中的所有显式语言系统；脚本默认 `LangSys` 始终保持为 Noto Sans SC，绝不会改写为西文标点。
 
@@ -123,4 +123,4 @@ INTERROBANG_BRIDGE_ITALIC=1 python scripts/build_interrobang_bridge.py
 
 ## 许可证
 
-本项目基于 [SIL Open Font License 1.1](OFL.txt) 发布。本字体为修改与组合衍生作品，并非 Hanken Grotesk、Noto / Source Han、煮豆黑体或 Inter 的官方发行版；详细署名见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+本项目基于 [SIL Open Font License 1.1](OFL.txt) 发布。本字体为修改与组合衍生作品，并非 Hanken Grotesk、Noto/Source Han、煮豆黑体或 Inter 的官方发行版；详细署名见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。

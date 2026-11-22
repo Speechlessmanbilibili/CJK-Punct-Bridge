@@ -1,6 +1,6 @@
 # 构建与审计脚本
 
-- `fetch_sources.py`：可选的联网预取步骤。下载锁定的 Google Fonts Noto SC / TC / JP / KR、Hanken 正斜体可变 TTF 以及煮豆黑体 `v2.000`，校验 SHA-256 后将煮豆黑体解压至已加入 `.gitignore` 的 `upstream/` 缓存目录。
+- `fetch_sources.py`：可选的联网预取步骤。下载锁定的 Google Fonts Noto SC/TC/JP/KR、Hanken 正斜体可变 TTF 以及煮豆黑体 `v2.000`，校验 SHA-256 后将煮豆黑体解压至已加入 `.gitignore` 的 `upstream/` 缓存目录。
 - `language_systems.py`：构建与审计共用的锁定 OpenType 语言系统注册表及字源策略常量。
 - `font_metadata.py`：所有构建与发行审计共用的规范项目作者、版权、来源署名、链接、许可证字段与内部字体版本号。
 - `build.py`：当 `upstream/` 就绪后可完全离线运行。默认构建全部正体 `TTF` 与 `WOFF2`，设置 `CJK_PUNCT_ITALIC=1` 时构建全部斜体，以简中作为无语言默认路径、对应 Noto 地区路径、显式西文 Hanken 标点与煮豆中文破折号。

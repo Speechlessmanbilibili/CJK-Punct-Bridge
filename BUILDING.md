@@ -1,6 +1,6 @@
 # 构建 CJK Punct Bridge
 
-构建过程仅使用来自 **Google Fonts 官方仓库** 分发的 Noto Sans SC / TC / JP / KR、Hanken Grotesk，以及煮豆黑体 `v2.000`，不会以作者个人仓库、系统字体或镜像构建替代 Noto 或 Hanken。精确的不可变下载链接与 SHA-256 哈希见 [SOURCES.md](SOURCES.md)。
+构建过程仅使用来自 **Google Fonts 官方仓库** 分发的 Noto Sans SC/TC/JP/KR、Hanken Grotesk，以及煮豆黑体 `v2.000`，不会以作者个人仓库、系统字体或镜像构建替代 Noto 或 Hanken。精确的不可变下载链接与 SHA-256 哈希见 [SOURCES.md](SOURCES.md)。
 
 ## 1. 预取上游字源（联网步骤）
 
@@ -68,11 +68,11 @@ INTERROBANG_BRIDGE_ITALIC=1 python scripts/build_interrobang_bridge.py
    硬性排除 ASCII 数字 `U+0030～U+0039`：桥接字体绝不能拦截数字，下游字体栈中的数字在任何语言下均由 Hanken Grotesk 提供。
 2. 以 Noto Sans SC 作为默认的 OpenType / 布局骨架，使未指定语言时的默认行为遵循其 `ZHS` 规则。
 3. 保留 Noto SC 标点 `GSUB` 行为，包括 `ccmp`、`dlig`、字宽替换、`vert` 与 `vrt2`。
-4. 从 Noto Sans TC / JP / KR 复制最终的本地化标点轮廓，并挂载到对应的中文、日文、韩文 `locl` 语言系统，包括已注册的香港、澳门、注音 / 拼音中文以及古谚文别名。地区竖排目标字形也一并复制并通过 `vert` / `vrt2` 挂载。
+4. 从 Noto Sans TC/JP/KR 复制最终的本地化标点轮廓，并挂载到对应的中文、日文、韩文 `locl` 语言系统，包括已注册的香港、澳门、注音 / 拼音中文以及古谚文别名。地区竖排目标字形也一并复制并通过 `vert` / `vrt2` 挂载。
 5. 将简繁中文的一字、二字、三字破折号轮廓替换为源自煮豆黑体的横排与竖排形态，同时保留 Noto 的连续破折号机制。
 6. 计算桥接字体与锁定 Google Fonts Hanken Grotesk 的完整标点交集（当前共 46 个码位）。为 `DFLT`、`latn`、`cyrl`、`grek` 下配置的所有显式西文语言通过 `locl` 挂载 Hanken 替换字形，且不暴露任何 Noto 标点替换。各脚本默认语言系统仍保持 Noto SC，显式 CJK 标签仍走各自对应的 Noto 地区路径。
 7. 构建 5 个静态主控字重，插值生成 `wght` `100～900` 可变 TTF，再实例化 9 个静态字重并输出 `WOFF2`。斜体家族遵循相同管线，西文源换用 Hanken Grotesk Italic，中日韩字源则施加人工倾斜。
 
 各个地区的 Google Fonts Noto 标点子集在子集化后保留了相同的核心标点 `GSUB` 特性集合；韩文版中标点之外的额外排版查找表会在标点闭包过程中移除，本桥接字体无需这些查找表。
 
-`scripts/language_systems.py` 收录了项目在 Common / Latin / Cyrillic / Greek 策略中使用的 OpenType 1.9 已注册标签，涵盖所有项目地区、广泛的现代与历史西文语言集合，以及锁定 Hanken 字源中的所有显式语言系统，并且有意不修改任何脚本的默认 `LangSys`。
+`scripts/language_systems.py` 收录了项目在 Common/Latin/Cyrillic/Greek 策略中使用的 OpenType 1.9 已注册标签，涵盖所有项目地区、广泛的现代与历史西文语言集合，以及锁定 Hanken 字源中的所有显式语言系统，并且有意不修改任何脚本的默认 `LangSys`。
