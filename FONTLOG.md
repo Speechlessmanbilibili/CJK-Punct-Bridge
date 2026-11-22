@@ -1,5 +1,10 @@
 # FONTLOG
 
+## 1.350 / v1.3.5 — 2026-11-22
+
+- Included the upright build fix (`cf6376f`) ensuring upright builds always source Inter punctuation from `InterVariable.ttf`.
+- Advanced internal font revision to 1.350 and rebuilt all static, variable, and WOFF2 outputs for the standard bridge, `CJK Punct Bridge ?!`, and `Interrobang Bridge`.
+
 ## 1.340 / v1.3.4 — 2026-08-28
 
 - Replaced `!`, `?`, `¡`, and `¿` with matching Inter 4.001 outlines in the standard and optional families.

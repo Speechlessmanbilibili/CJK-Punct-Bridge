@@ -11,4 +11,4 @@
 
 `build_variable_interrobang.py` remains available for rebuilding only the optional variable font from already generated static masters; it uses the same corrected metadata rules.
 
-`SOURCES.md` records the immutable source revisions and hashes used by v1.3.4. All Noto Sans and Hanken Grotesk inputs are pinned Google Fonts repository files.
+`SOURCES.md` records the immutable source revisions and hashes used by v1.3.5. All Noto Sans and Hanken Grotesk inputs are pinned Google Fonts repository files.

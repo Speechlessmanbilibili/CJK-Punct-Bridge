@@ -4,7 +4,7 @@
 
 > This is a punctuation companion, not a standalone text typeface. It intentionally leaves letters, CJK ideographs, kana, Hangul, and ASCII digits to the fonts that follow it in the stack.
 
-**v1.3.4 is the current release.** It standardizes question/exclamation forms on Inter and retains direct `U+203D` mapping in the
+**v1.3.5 is the current release.** It standardizes question/exclamation forms on Inter and retains direct `U+203D` mapping in the
 optional CJK `?!` family, the independent Interrobang Bridge attachment, and
 WOFF2 output for every static and variable face.
 
@@ -141,7 +141,7 @@ this documentation. The variant ships as its own family
 (`CJKPunctBridgeInterrobang-*`) with upright and italic variable fonts plus
 nine static weights each, so it can be installed or removed independently.
 All static and variable faces are also supplied as WOFF2 files.
-The release attachment is named `CJKPunctBridgeInterrobang-v1.3.4.zip`.
+The release attachment is named `CJKPunctBridgeInterrobang-v1.3.5.zip`.
 Build it from the standard statics with:
 
 ```bash
@@ -166,7 +166,7 @@ The attachment provides nine static upright weights, nine static italics, and
 separate upright/italic `wght` variable fonts. Every master is instantiated
 from the matching Inter 4.001 weight, and direct `U+203D` input is supported.
 All twenty TTF faces have matching WOFF2 files.
-The release attachment is named `InterrobangBridge-v1.3.4.zip`.
+The release attachment is named `InterrobangBridge-v1.3.5.zip`.
 
 ```bash
 python scripts/build_interrobang_bridge.py
